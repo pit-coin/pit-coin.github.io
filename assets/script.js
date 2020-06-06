@@ -330,7 +330,7 @@
         }
         var value = new BigNumber(document.getElementById("buyValue").value);
         if (value.isNaN() || value.isGreaterThan(eth)) {
-            var message = "enter number less then " + eth.toFixed(6, BigNumber.ROUND_FLOOR);
+            var message = "enter number less than " + eth.toFixed(6, BigNumber.ROUND_FLOOR);
             document.getElementById("buyValue").value = "";
             document.getElementById("buyValue").placeholder = message;
             blocked = false;
@@ -379,7 +379,7 @@
         }
         var value = new BigNumber(document.getElementById("sellValue").value);
         if (value.isNaN() || value.isGreaterThan(tokens)) {
-            var message = "enter number not greater then " + tokens.toFixed(6, BigNumber.ROUND_FLOOR);
+            var message = "enter number not greater than " + tokens.toFixed(6, BigNumber.ROUND_FLOOR);
             document.getElementById("sellValue").value = "";
             document.getElementById("sellValue").placeholder = message;
             blocked = false;
