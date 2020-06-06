@@ -1,8 +1,8 @@
 "use strict";
 (function () {
     var mainAddress = null;
-    var ropstenAddress = "0x4C072903C9246dd0B0BE6169e1372ad6d393b266";
-    var goerliAddress = "0x94ef2cea1B81De4eBacF7Cb7eB65415C92cE354D";
+    var ropstenAddress = "0x6342A5c056F71E7E3a6Bf89560Dc1F97210bDb51";
+    var goerliAddress = null;
 
     var abi = [
         {
