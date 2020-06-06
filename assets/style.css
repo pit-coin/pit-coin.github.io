@@ -1,0 +1,126 @@
+@font-face {
+    font-family: 'imported';
+    src: url(font.woff2) format('woff2');
+}
+html, body {
+    margin: 0px;
+    padding: 0px;
+}
+div, button, input {
+    font-family: "imported", monospace;
+}
+h1, h2 {
+    font-weight: normal;
+}
+.center {
+    text-align: center;
+}
+.onestring {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#notSupported, #contractNotFound, #loaded {
+    display: none;
+}
+
+.content {
+    margin: 0px 5%;
+}
+h2, #logs {
+    margin-top: 80px;
+}
+#connect {
+    display: block;
+    margin: auto;
+    width: 110px;
+    padding: 12px;
+    border: 3px solid black;
+    border-radius: 1000px;
+    background: none;
+    outline: 0;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+#connect:hover {
+    background-color: lightgray;
+}
+.columns::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+.column {
+    float: left;
+    width: 100%;
+}
+.column div {
+    max-width: 400px;
+    margin: 16px auto;
+}
+label {
+    display: block;
+    margin-bottom: 24px;
+    cursor: text;
+}
+label input {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    border: none;
+    border-bottom: 1px solid lightgray;
+    outline: 0;
+    background: none;
+    font-size: 16px;
+}
+#refAddress {
+    font-size: 14px;
+}
+label input:hover {
+    border-color: black;
+}
+label input:focus {
+    border-color: black;
+}
+button {
+    display: block;
+    margin: auto;
+    width: 140px;
+    padding: 12px;
+    border: 3px solid black;
+    border-radius: 1000px;
+    background: none;
+    outline: 0;
+    font-size: 16px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: lightgray;
+}
+a {
+    color: black;
+    outline: 0;
+    cursor: pointer;
+}
+a:hover {
+    text-decoration: none;
+}
+
+@media screen and (min-width: 910px) {
+    .column {
+        width: 50%;
+    }
+    .row {
+        height: 56px;
+    }
+}
+
+@media screen and (min-width: 1300px) {
+    .content {
+        margin: 0px 15%;
+    }
+    h2 {
+        margin-top: 128px;
+    }
+}

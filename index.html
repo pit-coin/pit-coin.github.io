@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <title>PITcoin</title>
+
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+        <meta name="description" content="Participation in Immutable Transparency" />
+        <meta name="keywords" content="PITcoin, PIT, token, eth, erc20, ethereum" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="shortcut icon" href="assets/icon.png" />
+        <link rel="stylesheet" href="assets/style.css" />
+    </head>
+    <body>
+        <div class="content">
+            <h1 class="center">PITcoin</h1>
+            <p class="center onestring">
+                <span id="loading">Loading...</span>
+                <span id="notSupported">
+                    <a target="_blank" rel="noopener" href="https://ethereum.org">Ethereum</a>
+                    is not supported
+                </span>
+                <span id="loaded">
+                    Contract
+                    <span id="contractNotFound">not found, switch the network</span>
+                    <a id="contractAddress" target="_blank" rel="noopener"></a>
+                </span>
+            </p>
+            <p class="center">Contract balance <span id="contractBalance">...</span> ETH</p>
+            <a id="connect" href="#actions">Connect</a>
+            <p>Fully ERC20-compliant token. Fixed price 0.1 ETH/PIT. Buy, sell - 10% fee, transfer - 5% fee. Withdraw, reinvest - no fee. Referral bonus - 3%. Minimal amount required to receive referral bonuses - 10 PIT. To buy tokens you can send eth directly to the contract address. No owners and administrators. Enjoy!</p>
+            <h2 id="actions" class="center">Your balance <span id="balance">...</span> PIT</h2>
+            <p class="center">Buy and sell PIT</p>
+            <div class="columns">
+                <div class="column">
+                    <div>
+                        <label>Eth value
+                            <input id="buyValue" type="text" maxlength="22" />
+                        </label>
+                        <label class="row">Referral address (optional)
+                            <input id="refAddress" type="text" size="42" maxlength="42" />
+                        </label>
+                        <button id="buy" type="button">Buy</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <div>
+                        <label>PIT value
+                            <input id="sellValue" type="text" maxlength="22" />
+                        </label>
+                        <label class="row"></label>
+                        <button id="sell" type="button">Sell</button>
+                    </div>
+                </div>
+            </div>
+            <h2 class="center">Your dividend <span id="dividend">...</span> ETH, including referral <span id="refDividend">...</span> ETH</h2>
+            <p class="center">Reinvest and withdraw dividend</p>
+            <div class="columns">
+                <div class="column">
+                    <div>
+                        <button id="reinvest" type="button">Reinvest</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <div>
+                        <button id="withdraw" type="button">Withdraw</button>
+                    </div>
+                </div>
+            </div>
+            <div id="logs"></div>
+        </div>
+        <script src="assets/script.js"></script>
+    </body>
+</html>
