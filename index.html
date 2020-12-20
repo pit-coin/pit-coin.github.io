@@ -1,59 +1,61 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html lang="en">
     <head>
         <title>PITcoin Bond</title>
 
         <meta charset="utf-8" />
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
         <meta name="description" content="Fixed price 0.1 ETH/PIT - Buy: 10% fee - Sell: 10% fee - Transfer: 5% fee - Withdraw and Reinvest: No Fee - Referral Bonus: 3% - Minimal amount required to receive referral bonuses = 10 PIT - No owners, administrators or GOVERNANCE" />
         <meta name="keywords" content="pitcoin network" />
-
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="lightgray" />
 
-        <link rel="shortcut icon" href="assets/icon.png" />
+        <link rel="icon" href="assets/icon.png" />
         <link rel="stylesheet" href="assets/style.css" />
     </head>
     <body>
-        <div class="content">
-            <h1 class="center">PITcoin Bond</h1>
-            <p class="center">Fully ERC20-compliant token</p>
-            <p class="center onestring">
-                <span id="loading">Loading...</span>
-                <span id="notSupported">
-                    <a target="_blank" rel="noopener" href="https://ethereum.org">Ethereum</a>
-                    is not supported
-                </span>
-                <span id="loaded">
-                    Contract
-                    <span id="contractNotFound">not found, switch the network</span>
-                    <a id="contractAddress" target="_blank" rel="noopener"></a>
-                </span>
+        <div id="noFooter">
+            <h1>PITcoin Bond</h1>
+            <p>Fully ERC20-compliant token</p>
+            <p class="onestring">Contract
+                <a id="contract"
+                   href="https://etherscan.io/address/0x99cbe93AFee15456a1115540e7F534F6629bAB3f"
+                   target="_blank" rel="noopener">0x99cbe93AFee15456a1115540e7F534F6629bAB3f</a>
             </p>
-            <p class="center">Contract balance <span id="contractBalance">...</span> ETH</p>
-            <a id="connect" href="#actions">CONNECT</a>
-            <p class="center">Fixed price 0.1 ETH/PIT</p>
-            <p class="center">Buy: 10% fee - Sell: 10% fee - Transfer: 5% fee - Withdraw and Reinvest: No Fee</p>
-            <p class="center">Referral Bonus: 3% Minimal amount required to receive referral bonuses = 10 PIT</p>
-            <p class="center">To buy, sell, reinvest and withdraw tokens you can move ETH directly on the contract address</p>
-            <p class="center">No owners, administrators or GOVERNANCE. Enjoy!</p>
-            <h2 id="actions" class="center">Your balance <span id="balance">...</span> PIT</h2>
-            <p class="center">Buy and sell PIT</p>
-            <div class="columns">
-                <div class="column">
+            <p>Contract balance <span id="contractBalance">...</span> ETH</p>
+            <div id="start">
+                <p id="startMessage">loading...</p>
+                <button id="connect" type="button">CONNECT</button>
+            </div>
+            <p>Fixed price 0.1 ETH/PIT</p>
+            <p>Buy: 10% fee - Sell: 10% fee - Transfer: 5% fee - Withdraw and Reinvest: No Fee</p>
+            <p>Referral Bonus: 3% Minimal amount required to receive referral bonuses = 10 PIT</p>
+            <p>To buy, sell, reinvest and withdraw tokens you can move ETH
+                directly on the contract address</p>
+            <p>No owners, administrators or GOVERNANCE. Enjoy!</p>
+            <h2>Your balance <span id="balance">...</span> PIT</h2>
+            <p>Buy and sell PIT</p>
+            <div class="halfContainer">
+                <div class="half">
                     <div>
-                        <label>ETH value
+                        <label>
+                            ETH value
+                            <span id="buyValueHint" class="hint"></span>
                             <input id="buyValue" type="text" maxlength="22" />
                         </label>
-                        <label class="row">Referral address (optional)
+                        <label class="row">
+                            Referral address (optional)
+                            <span id="refAddressHint" class="hint"></span>
                             <input id="refAddress" type="text" size="42" maxlength="42" />
                         </label>
                         <button id="buy" type="button">Buy</button>
                     </div>
                 </div>
-                <div class="column">
+                <div class="half">
                     <div>
-                        <label>PIT value
+                        <label>
+                            PIT value
+                            <span id="sellValueHint" class="hint"></span>
                             <input id="sellValue" type="text" maxlength="22" />
                         </label>
                         <label class="row"></label>
@@ -61,15 +63,17 @@
                     </div>
                 </div>
             </div>
-            <h2 class="center">Your Interest <span id="dividend">...</span> ETH, including referral <span id="refDividend">...</span> ETH</h2>
-            <p class="center">Reinvest and withdraw Interest</p>
-            <div class="columns">
-                <div class="column">
+            <h2>Your Interest <span id="dividend">...</span> ETH, including referral
+                <span id="refDividend">...</span> ETH
+            </h2>
+            <p>Reinvest and withdraw Interest</p>
+            <div class="halfContainer">
+                <div class="half">
                     <div>
                         <button id="reinvest" type="button">Reinvest</button>
                     </div>
                 </div>
-                <div class="column">
+                <div class="half">
                     <div>
                         <button id="withdraw" type="button">Withdraw</button>
                     </div>
@@ -77,6 +81,17 @@
             </div>
             <div id="logs"></div>
         </div>
+        <div id="footer">
+            <div>
+                <a target="_blank" rel="noopener"
+                   href="https://t.me/joinchat/Htm91RrhlyUFjfRpfb5Vyg">telegram</a>
+                <a target="_blank" rel="noopener"
+                   href="https://youtube.com/c/BlockchainForWhatIsBest">youtube</a>
+                <a target="_blank" rel="noopener"
+                   href="https://github.com/pit-coin/pit-coin.github.io">github</a>
+            </div>
+        </div>
+        <script src="assets/bignumber.min.js"></script>
         <script src="assets/script.js"></script>
     </body>
 </html>

@@ -1,63 +1,30 @@
+/* background lightgray */
+
 @font-face {
     font-family: 'imported';
-    src: url(font.woff2) format('woff2');
+    src: url(font.woff2);
 }
 html, body {
     margin: 0px;
     padding: 0px;
 }
 div, button, input {
-    font-family: "imported", monospace;
+    font-family: "imported", sans-serif;
 }
-h1, h2 {
-    font-weight: normal;
-}
-.center {
-    text-align: center;
-}
-.onestring {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-#notSupported, #contractNotFound, #loaded {
-    display: none;
-}
-
-.content {
-    margin: 0px 5%;
-}
-h2, #logs {
-    margin-top: 80px;
-}
-#connect {
+button {
     display: block;
     margin: auto;
-    width: 110px;
-    padding: 12px;
     border: 3px solid black;
-    border-radius: 1000px;
-    background: none;
-    outline: 0;
-    text-align: center;
-    text-decoration: none;
+    border-radius: 100px;
+    width: 140px;
+    padding: 12px;
+    background: transparent;
     font-size: 16px;
     cursor: pointer;
+    outline: 0;
 }
-#connect:hover {
-    background-color: lightgray;
-}
-.columns::after {
-    content: "";
-    clear: both;
-    display: table;
-}
-.column {
-    float: left;
-    width: 100%;
-}
-.column div {
-    max-width: 400px;
-    margin: 16px auto;
+button:focus {
+    background: lightgray;
 }
 label {
     display: block;
@@ -66,61 +33,113 @@ label {
 }
 label input {
     display: block;
-    width: 100%;
     margin-top: 8px;
     border: none;
     border-bottom: 1px solid lightgray;
-    outline: 0;
-    background: none;
+    width: 100%;
+    background: transparent;
     font-size: 16px;
-}
-#refAddress {
-    font-size: 14px;
-}
-label input:hover {
-    border-color: black;
+    outline: 0;
 }
 label input:focus {
     border-color: black;
 }
-button {
-    display: block;
-    margin: auto;
-    width: 140px;
-    padding: 12px;
-    border: 3px solid black;
-    border-radius: 1000px;
-    background: none;
-    outline: 0;
-    font-size: 16px;
-    cursor: pointer;
-}
-button:hover {
-    background-color: lightgray;
-}
-a {
-    color: black;
-    outline: 0;
-    cursor: pointer;
-}
-a:hover {
-    text-decoration: none;
+h1, h2 {
+    text-align: center;
+    font-weight: normal;
 }
 
-@media screen and (min-width: 910px) {
-    .column {
+#noFooter {
+    overflow: auto;
+    margin: 0px 5%;
+    min-height: calc(100vh - 96px);
+}
+#noFooter p {
+    text-align: center;
+}
+#noFooter a {
+    color: black;
+    outline: 0;
+}
+#noFooter a:focus {
+    color: lightgray;
+}
+.onestring {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#start {
+    min-height: 64px;
+    padding-top: 8px;
+}
+#connect {
+    display: none;
+}
+h2, #logs {
+    margin-top: 80px;
+}
+.half div {
+    max-width: 400px;
+    margin: 28px auto;
+}
+.hint {
+    padding-left: 10px;
+    font-size: 12px;
+    color: red;
+}
+#refAddress {
+    font-size: 14px;
+}
+#logs {
+    margin-bottom: 32px;
+}
+#logs p {
+    text-align: left;
+}
+#footer {
+    overflow: auto;
+    height: 96px;
+    background: lightgray;
+}
+#footer div {
+    margin-top: 36px;
+    text-align: center;
+}
+#footer a {
+    margin: 0px 2vw;
+    padding: 2px;
+    color: black;
+    text-decoration: none;
+    outline: 0;
+}
+#footer a:focus {
+    text-decoration: underline;
+}
+
+@media print, screen and (min-width: 910px) {
+    .halfContainer {
+        overflow: auto;
+    }
+    .half {
+        float: left;
         width: 50%;
     }
     .row {
         height: 56px;
     }
 }
-
-@media screen and (min-width: 1300px) {
-    .content {
+@media print, screen and (min-width: 1300px) {
+    #noFooter {
         margin: 0px 15%;
     }
     h2 {
         margin-top: 128px;
     }
+}
+
+@media (hover: hover) {
+    button:hover {background: lightgray;}
+    label input:hover {border-color: black;}
+    #noFooter a:hover {color: lightgray;}
+    #footer a:hover {text-decoration: underline;}
 }
