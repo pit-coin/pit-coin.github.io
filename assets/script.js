@@ -197,6 +197,7 @@
                 clearContractBalance();
                 loadContractBalance();
                 document.getElementById('logs').innerHTML = '';
+                printNetwork();
                 contract.events.allEvents().on('data', function () {
                     if (network !== null) {
                         loadContractBalance();
@@ -223,21 +224,207 @@
                 clearAccount();
                 loadAccount();
                 logAccount();
-            }).catch(function (error) {
-                console.error(error);
-                if (error.message) {
-                    error = error.message;
-                }
-                alert(error);
-            });
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-        });
+            }).catch(error);
+        }).catch(error);
     }
+
+    function connect() {
+        if (typeof window.ethereum === 'undefined') {
+            alert('ethereum is not loaded');
+            return;
+        }
+        var f;
+        if (typeof ethereum.request === 'undefined') {
+            f = ethereum.enable();
+        } else {
+            f = ethereum.request({method: 'eth_requestAccounts'});
+        }
+        f.then(function () {
+            return web3.eth.getChainId();
+        }).then(function (newNetwork) {
+            newNetwork = Number(newNetwork);
+            if (newNetwork !== networkMain && newNetwork !== networkRopsten &&
+                newNetwork !== networkGoerli) {
+                alert('switch to the main, ropsten or goerli network');
+            }
+        }).catch(error);
+    }
+
+    function buy() {
+        document.getElementById('buyValueHint').innerHTML = '';
+        document.getElementById('refAddressHint').innerHTML = '';
+        if (!check()) {
+            return;
+        }
+        if (accountEth && accountEth.isZero()) {
+            document.getElementById('buyValueHint').innerHTML = 'you have no eth';
+            return;
+        }
+        var value = new BigNumber(document.getElementById('buyValue').value);
+        if (value.isNaN()) {
+            document.getElementById('buyValueHint').innerHTML = 'enter a number';
+            document.getElementById('buyValue').focus();
+            return;
+        }
+        if (value.isNegative() || value.isZero()) {
+            document.getElementById('buyValueHint').innerHTML = 'enter a positive number';
+            document.getElementById('buyValue').focus();
+            return;
+        }
+        if (accountEth && value.isGreaterThan(accountEth)) {
+            document.getElementById('buyValueHint').innerHTML =
+                'enter a number less than ' + accountEth.toFixed(6, BigNumber.ROUND_FLOOR);
+            document.getElementById('buyValue').focus();
+            return;
+        }
+        var address = document.getElementById('refAddress').value;
+        if (address !== '' && !web3.utils.isAddress(address)) {
+            document.getElementById('refAddressHint').innerHTML = 'enter correct address';
+            document.getElementById('refAddress').focus();
+            return;
+        }
+
+        blocked = true;
+        if (address !== '') {
+            contract.methods.balanceOf(address).call().then(function (balance) {
+                if (new BigNumber(balance).shiftedBy(-18).isLessThan(10)) {
+                    document.getElementById('refAddressHint').innerHTML = 'not a referral';
+                    document.getElementById('refAddress').focus();
+                    blocked = false;
+                } else {
+                    doTx();
+                }
+            }).catch(error);
+        } else {
+            address = '0x0000000000000000000000000000000000000000';
+            doTx();
+        }
+
+        function doTx() {
+            var message;
+            contract.methods.buy(address).send({
+                from: account,
+                value: value.shiftedBy(18)
+            }).on('transactionHash', function (hash) {
+                document.getElementById('buyValue').value = '';
+                document.getElementById('refAddress').value = '';
+                message = logTx('purchase for ' + value + ' ETH', hash);
+                blocked = false;
+            }).on('confirmation', function (confirmationNumber, receipt) {
+                if (confirmationNumber != 0) {
+                    return;
+                }
+                if (!receipt.status) {
+                    message.innerHTML = ' - rejected';
+                } else {
+                    loadContractBalance();
+                    loadAccount();
+                    message.innerHTML = ' - confirmed';
+                }
+            }).catch(error);
+        }
+    }
+
+    function sell() {
+        document.getElementById('sellValueHint').innerHTML = '';
+        if (!check()) {
+            return;
+        }
+        if (accountTokens && accountTokens.isZero()) {
+            document.getElementById('sellValueHint').innerHTML = 'you have no tokens';
+            document.getElementById('buyValue').focus();
+            return;
+        }
+        var value = new BigNumber(document.getElementById('sellValue').value);
+        if (value.isNaN()) {
+            document.getElementById('sellValueHint').innerHTML = 'enter a number';
+            document.getElementById('sellValue').focus();
+            return;
+        }
+        if (value.isNegative() || value.isZero()) {
+            document.getElementById('sellValueHint').innerHTML = 'enter a positive number';
+            document.getElementById('sellValue').focus();
+            return;
+        }
+        if (accountTokens && value.isGreaterThan(accountTokens)) {
+            document.getElementById('sellValueHint').innerHTML =
+                'enter a number less than ' + accountTokens.toFixed(6, BigNumber.ROUND_FLOOR);
+            document.getElementById('sellValue').focus();
+            return;
+        }
+
+        blocked = true;
+        var message;
+        contract.methods.sell(value.shiftedBy(18).toFixed(0)).send({
+            from: account
+        }).on('transactionHash', function (hash) {
+            document.getElementById('sellValue').value = '';
+            message = logTx('sale of ' + value + ' PIT', hash);
+            blocked = false;
+        }).on('confirmation', function (confirmationNumber, receipt) {
+            if (confirmationNumber != 0) {
+                return;
+            }
+            if (!receipt.status) {
+                message.innerHTML = ' - rejected';
+            } else {
+                loadAccount();
+                message.innerHTML = ' - confirmed';
+            }
+        }).catch(error);
+    }
+
+    function withdraw() {
+        if (!check()) {
+            return;
+        }
+
+        blocked = true;
+        var message;
+        contract.methods.withdraw().send({
+            from: account
+        }).on('transactionHash', function (hash) {
+            message = logTx('withdrawal', hash);
+            blocked = false;
+        }).on('confirmation', function (confirmationNumber, receipt) {
+            if (confirmationNumber != 0) {
+                return;
+            }
+            if (!receipt.status) {
+                message.innerHTML = ' - rejected';
+            } else {
+                loadContractBalance();
+                loadAccount();
+                message.innerHTML = ' - confirmed';
+            }
+        }).catch(error);
+    }
+
+    function reinvest() {
+        if (!check()) {
+            return;
+        }
+
+        blocked = true;
+        var message;
+        contract.methods.reinvest().send({
+            from: account
+        }).on('transactionHash', function (hash) {
+            message = logTx('reinvest', hash);
+            blocked = false;
+        }).on('confirmation', function (confirmationNumber, receipt) {
+            if (confirmationNumber != 0) {
+                return;
+            }
+            if (!receipt.status) {
+                message.innerHTML = ' - rejected';
+            } else {
+                loadAccount();
+                message.innerHTML = ' - confirmed';
+            }
+        }).catch(error);
+    }
+
 
     function printContractLink(network) {
         if (network === networkMain) {
@@ -263,24 +450,13 @@
     function loadContractBalance() {
         web3.eth.getBalance(contract.options.address).then(function (balance) {
             balance = new BigNumber(balance).shiftedBy(-18);
-            if (balance.isZero()) {
-                document.getElementById('contractBalance').title = '0';
-                document.getElementById('contractBalance').innerHTML = '0';
-            } else {
-                document.getElementById('contractBalance').title = balance;
-                balance = balance.toFixed(3, BigNumber.ROUND_DOWN);
-                document.getElementById('contractBalance').innerHTML = balance;
-            }
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-        });
+            printValue(balance, document.getElementById('contractBalance'));
+        }).catch(error);
     }
 
     function clearAccount() {
+        accountEth = null;
+        accountTokens = null;
         document.getElementById('balance').title = '';
         document.getElementById('balance').innerHTML = '...';
         document.getElementById('buyValueHint').innerHTML = '';
@@ -297,60 +473,24 @@
 
     function loadAccount() {
         var refDividend;
-        contract.methods.refDividendsOf(account).call().then(function (result) {
-            refDividend = new BigNumber(result).shiftedBy(-19);
-            if (refDividend.isZero()) {
-                document.getElementById('refDividend').title = '0';
-                document.getElementById('refDividend').innerHTML = '0';
-            } else {
-                document.getElementById('refDividend').title = refDividend;
-                result = refDividend.toFixed(3, BigNumber.ROUND_DOWN);
-                document.getElementById('refDividend').innerHTML = result;
-            }
+        contract.methods.refDividendsOf(account).call().then(function (dividends) {
+            refDividend = new BigNumber(dividends).shiftedBy(-19);
+            printValue(refDividend, document.getElementById('refDividend'));
             return contract.methods.dividendsOf(account).call();
-        }).then(function (result) {
-            result = new BigNumber(result).shiftedBy(-19).plus(refDividend);
-            if (result.isZero()) {
-                document.getElementById('dividend').title = '0';
-                document.getElementById('dividend').innerHTML = '0';
-            } else {
-                document.getElementById('dividend').title = result;
-                result = result.toFixed(3, BigNumber.ROUND_DOWN);
-                document.getElementById('dividend').innerHTML = result;
+        }).then(function (dividends) {
+            if (dividends === '1') {
+                dividends = '0';
             }
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-        });
+            dividends = new BigNumber(dividends).shiftedBy(-19).plus(refDividend);
+            printValue(dividends, document.getElementById('dividend'));
+        }).catch(error);
         contract.methods.balanceOf(account).call().then(function (balance) {
             accountTokens = new BigNumber(balance).shiftedBy(-18);
-            if (accountTokens.isZero()) {
-                document.getElementById('balance').title = '0';
-                document.getElementById('balance').innerHTML = '0';
-            } else {
-                document.getElementById('balance').title = accountTokens;
-                balance = accountTokens.toFixed(3, BigNumber.ROUND_DOWN);
-                document.getElementById('balance').innerHTML = balance;
-            }
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-        });
+            printValue(accountTokens, document.getElementById('balance'));
+        }).catch(error);
         web3.eth.getBalance(account).then(function (balance) {
             accountEth = new BigNumber(balance).shiftedBy(-18);
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-        });
+        }).catch(error);
     }
 
     function logAccount() {
@@ -404,33 +544,19 @@
         return span;
     }
 
-    function connect() {
-        if (typeof window.ethereum === 'undefined') {
-            alert('ethereum is not loaded');
-            return;
+    function printNetwork() {
+        var p = document.createElement('p');
+        if (network === networkMain) {
+            p.innerHTML = 'ethereum mainnet';
+        } else if (network === networkRopsten) {
+            p.innerHTML = 'ropsten test network';
+        } else if (network === networkGoerli) {
+            p.innerHTML = 'goerli test network';
         }
-        var f;
-        if (typeof ethereum.request === 'undefined') {
-            f = ethereum.enable();
-        } else {
-            f = ethereum.request({method: 'eth_requestAccounts'});
-        }
-        f.then(function () {
-            web3.eth.getChainId().then(function (newNetwork) {
-                newNetwork = Number(newNetwork);
-                if (newNetwork !== networkMain && newNetwork !== networkRopsten &&
-                    newNetwork !== networkGoerli) {
-                    alert('switch to the main, ropsten or goerli network');
-                }
-            });
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-        });
+        var logs = document.getElementById('logs');
+        logs.insertBefore(p, logs.firstChild);
     }
+
 
     function check() {
         if (typeof window.ethereum === 'undefined') {
@@ -447,175 +573,28 @@
         return false;
     }
 
-    function buy() {
-        document.getElementById('buyValueHint').innerHTML = '';
-        document.getElementById('refAddressHint').innerHTML = '';
-        if (!check()) {
-            return;
+    function error(error) {
+        console.error(error);
+        if (error.message) {
+            error = error.message;
         }
-        if (accountEth && accountEth.isZero()) {
-            document.getElementById('buyValueHint').innerHTML = 'you have no eth';
-            return;
-        }
-        var value = new BigNumber(document.getElementById('buyValue').value);
-        if (value.isNaN()) {
-            document.getElementById('buyValueHint').innerHTML = 'enter a number';
-            return;
-        }
-        if (accountEth && value.isGreaterThan(accountEth)) {
-            document.getElementById('buyValueHint').innerHTML =
-                'enter a number less than ' + accountEth.toFixed(6, BigNumber.ROUND_FLOOR);
-            return;
-        }
-        var address = document.getElementById('refAddress').value;
-        if (address === '') {
-            address = '0x0000000000000000000000000000000000000000';
-        } else if (!web3.utils.isAddress(address)) {
-            document.getElementById('refAddressHint').innerHTML = 'enter correct address';
-            return;
-        }
-
-        blocked = true;
-        var message;
-        contract.methods.buy(address).send({
-            from: account,
-            value: value.shiftedBy(18)
-        }).on('transactionHash', function (hash) {
-            document.getElementById('buyValue').value = '';
-            document.getElementById('refAddress').value = '';
-            message = logTx('purchase for ' + value + ' ETH', hash);
-            blocked = false;
-        }).on('confirmation', function (confirmationNumber, receipt) {
-            if (confirmationNumber != 0) {
-                return;
-            }
-            if (!receipt.status) {
-                message.innerHTML = ' - rejected';
-            } else {
-                loadContractBalance();
-                loadAccount();
-                message.innerHTML = ' - confirmed';
-            }
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-            blocked = false;
-        });
+        alert('error: ' + error);
+        blocked = false;
     }
 
-    function sell() {
-        document.getElementById('sellValueHint').innerHTML = '';
-        if (!check()) {
-            return;
-        }
-        if (accountTokens && accountTokens.isZero()) {
-            document.getElementById('sellValueHint').innerHTML = 'you have no tokens';
-            return;
-        }
-        var value = new BigNumber(document.getElementById('sellValue').value);
-        if (value.isNaN()) {
-            document.getElementById('sellValueHint').innerHTML = 'enter a number';
-            return;
-        }
-        if (accountTokens && value.isGreaterThan(accountTokens)) {
-            document.getElementById('sellValueHint').innerHTML =
-                'enter a number less than ' + accountTokens.toFixed(6, BigNumber.ROUND_FLOOR);
-            return;
-        }
-
-        blocked = true;
-        var message;
-        contract.methods.sell(value.shiftedBy(18).toFixed(0)).send({
-            from: account
-        }).on('transactionHash', function (hash) {
-            document.getElementById('sellValue').value = '';
-            message = logTx('sale of ' + value + ' PIT', hash);
-            blocked = false;
-        }).on('confirmation', function (confirmationNumber, receipt) {
-            if (confirmationNumber != 0) {
-                return;
-            }
-            if (!receipt.status) {
-                message.innerHTML = ' - rejected';
+    function printValue(value, element) {
+        if (value.isZero()) {
+            element.title = '';
+            element.innerHTML = '0';
+        } else {
+            element.title = value.toFixed(18);
+            if (value.isGreaterThan(0.001)) {
+                element.innerHTML = value.toFixed(3, BigNumber.ROUND_DOWN);
+            } else if (value.isGreaterThan(0.000001)) {
+                element.innerHTML = value.toFixed(6, BigNumber.ROUND_DOWN);
             } else {
-                loadAccount();
-                message.innerHTML = ' - confirmed';
+                element.innerHTML = value.toExponential(3, BigNumber.ROUND_DOWN);
             }
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-            blocked = false;
-        });
-    }
-
-    function withdraw() {
-        if (!check()) {
-            return;
         }
-
-        blocked = true;
-        var message;
-        contract.methods.withdraw().send({
-            from: account
-        }).on('transactionHash', function (hash) {
-            message = logTx('withdrawal', hash);
-            blocked = false;
-        }).on('confirmation', function (confirmationNumber, receipt) {
-            if (confirmationNumber != 0) {
-                return;
-            }
-            if (!receipt.status) {
-                message.innerHTML = ' - rejected';
-            } else {
-                loadContractBalance();
-                loadAccount();
-                message.innerHTML = ' - confirmed';
-            }
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-            blocked = false;
-        });
-    }
-
-    function reinvest() {
-        if (!check()) {
-            return;
-        }
-
-        blocked = true;
-        var message;
-        contract.methods.reinvest().send({
-            from: account
-        }).on('transactionHash', function (hash) {
-            message = logTx('reinvest', hash);
-            blocked = false;
-        }).on('confirmation', function (confirmationNumber, receipt) {
-            if (confirmationNumber != 0) {
-                return;
-            }
-            if (!receipt.status) {
-                message.innerHTML = ' - rejected';
-            } else {
-                loadAccount();
-                message.innerHTML = ' - confirmed';
-            }
-        }).catch(function (error) {
-            console.error(error);
-            if (error.message) {
-                error = error.message;
-            }
-            alert(error);
-            blocked = false;
-        });
     }
 })();

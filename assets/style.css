@@ -118,11 +118,11 @@ h2, #logs {
 
 @media print, screen and (min-width: 910px) {
     .halfContainer {
-        overflow: auto;
+        overflow: hidden;
     }
     .half {
         float: left;
-        width: 50%;
+        width: 49.9%;
     }
     .row {
         height: 56px;
