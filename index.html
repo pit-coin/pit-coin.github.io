@@ -5,80 +5,83 @@
 
         <meta charset="utf-8" />
 
-        <meta name="description" content="Fixed price 0.1 ETH/PIT - Buy: 10% fee - Sell: 10% fee - Transfer: 5% fee - Withdraw and Reinvest: No Fee - Referral Bonus: 3% - Minimal amount required to receive referral bonuses = 10 PIT - No owners, administrators or GOVERNANCE" />
-        <meta name="keywords" content="pitcoin network" />
+        <meta name="description"
+              content="Erc20 ethereum and tron token with fixed price of 0.1 eth or 1 trx.
+                       Buy/sell 10% fee, transfer 5% fee, fee is distributed among all holders.
+                       Referral bonus 3% for holders with more than 10 eth pit or 1000 trx pit.
+                       No owners and administrators." />
+        <meta name="keywords" content="pitcoin bond network aqoleg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="lightgray" />
+        <meta name="theme-color" content="#F7A219" />
 
         <link rel="icon" href="assets/196.png" />
         <link rel="stylesheet" href="assets/style.css" />
     </head>
     <body>
         <div id="noFooter">
+            <div id="header">
+                <div id="logo"><div></div></div>
+                <div id="headerButtons">
+                    <button id="trx" type="button" class="active">TRX</button>
+                    <button id="eth" type="button">ETH</button>
+                    <button id="connect" type="button">CONNECT</button>
+                </div>
+            </div>
+            <p id="startMessage"></p>
             <h1>PITcoin Bond</h1>
             <p>Fully ERC20-compliant token</p>
             <p class="onestring">Contract
                 <a id="contract"
-                   href="https://etherscan.io/address/0x99cbe93AFee15456a1115540e7F534F6629bAB3f"
-                   target="_blank" rel="noopener">0x99cbe93AFee15456a1115540e7F534F6629bAB3f</a>
+                   href="https://tronscan.org/#/contract/TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97"
+                   target="_blank" rel="noopener">TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97</a>
             </p>
-            <p>Contract balance <span id="contractBalance">...</span> ETH</p>
-            <div id="start">
-                <p id="startMessage">loading...</p>
-                <button id="connect" type="button">CONNECT</button>
-            </div>
-            <p>Fixed price 0.1 ETH/PIT</p>
+            <p>Contract balance <span id="contractBalance">...</span> <span class="currency"></span></p>
+            <p>Fixed price <span id="price">1</span> <span class="currency">TRX</span>/PIT</p>
             <p>Buy: 10% fee - Sell: 10% fee - Transfer: 5% fee - Withdraw and Reinvest: No Fee</p>
-            <p>Referral Bonus: 3% Minimal amount required to receive referral bonuses = 10 PIT</p>
-            <p>To buy, sell, reinvest and withdraw tokens you can move ETH
-                directly on the contract address</p>
+            <p>
+                Referral Bonus: 3% Minimal amount required to receive referral bonuses =
+                <span id="refAmount">1000</span>
+                PIT
+            </p>
             <p>No owners, administrators or GOVERNANCE. Enjoy!</p>
             <h2>Your balance <span id="balance">...</span> PIT</h2>
             <p>Buy and sell PIT</p>
-            <div class="halfContainer">
+            <div id="trade">
                 <div class="half">
-                    <div>
-                        <label>
-                            ETH value
-                            <span id="buyValueHint" class="hint"></span>
-                            <input id="buyValue" type="text" maxlength="22" />
-                        </label>
-                        <label class="row">
-                            Referral address (optional)
-                            <span id="refAddressHint" class="hint"></span>
-                            <input id="refAddress" type="text" size="42" maxlength="42" />
-                        </label>
-                        <button id="buy" type="button">Buy</button>
-                    </div>
+                    <label>
+                        <span class="currency">ETH</span> value
+                        <span id="buyValueHint" class="hint"></span>
+                        <input id="buyValue" type="text" maxlength="22" />
+                    </label>
+                    <button id="buy" type="button">Buy</button>
                 </div>
                 <div class="half">
-                    <div>
-                        <label>
-                            PIT value
-                            <span id="sellValueHint" class="hint"></span>
-                            <input id="sellValue" type="text" maxlength="22" />
-                        </label>
-                        <label class="row"></label>
-                        <button id="sell" type="button">Sell</button>
-                    </div>
+                    <label>
+                        PIT value
+                        <span id="sellValueHint" class="hint"></span>
+                        <input id="sellValue" type="text" maxlength="25" />
+                    </label>
+                    <button id="sell" type="button">Sell</button>
                 </div>
             </div>
-            <h2>Your Interest <span id="dividend">...</span> ETH, including referral
-                <span id="refDividend">...</span> ETH
+            <h2>
+                Your Interest
+                <span id="dividend">...</span>
+                <span class="currency">TRX</span>, including referral
+                <span id="refDividend">...</span>
+                <span class="currency">TRX</span>
             </h2>
             <p>Reinvest and withdraw Interest</p>
-            <div class="halfContainer">
-                <div class="half">
-                    <div>
-                        <button id="reinvest" type="button">Reinvest</button>
-                    </div>
+            <div id="divs">
+                <div class="smallHalf">
+                    <button id="reinvest" type="button">Reinvest</button>
                 </div>
-                <div class="half">
-                    <div>
-                        <button id="withdraw" type="button">Withdraw</button>
-                    </div>
+                <div class="smallHalf">
+                    <button id="withdraw" type="button">Withdraw</button>
                 </div>
             </div>
+            <h2 id="ref">Your referral link</h2>
+            <p id="reflink"></p>
             <div id="logs"></div>
         </div>
         <div id="footer">
@@ -91,6 +94,7 @@
                    href="https://github.com/pit-coin/pit-coin.github.io">github</a>
             </div>
         </div>
+        <div id="loading"><div></div></div>
         <script src="assets/bignumber.min.js"></script>
         <script src="assets/script.js"></script>
     </body>
