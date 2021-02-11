@@ -195,6 +195,7 @@
         for (var i = 0; i < list.length; i++) {
             list[i].innerHTML = eth ? 'ETH' : 'TRX';
         }
+        document.getElementById('erc').innerHTML = eth ? 'ERC' : 'TRC';
         document.getElementById('price').innerHTML = eth ? '0.1' : '1';
         document.getElementById('refAmount').innerHTML = eth ? '10' : '1000';
         clearContractBalance();
@@ -626,7 +627,7 @@
             alert('loading...');
         } else if (!eth && !window.tronWeb) {
             alert('tron is not supported');
-        } else if (!eth && !account) {
+        } else if (!eth && !tronWeb.defaultAddress.base58) {
             alert('open tronlink');
         } else if (!network) {
             if (eth) {
