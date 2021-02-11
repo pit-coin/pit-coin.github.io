@@ -776,6 +776,9 @@
                     document.getElementById('ref').style.display = 'block';
                     document.getElementById('reflink').innerHTML = '<a target="_blank" rel="noopener" ' +
                         'href="http://' + link + '">' + link + '</a>';
+                } else {
+                    document.getElementById('ref').style.display = 'none';
+                    document.getElementById('reflink').innerHTML = '';
                 }
             }).catch(error);
         } else {
