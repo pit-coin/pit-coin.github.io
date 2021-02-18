@@ -54,7 +54,7 @@ Feel free to join.
 
 [Beta version](https://pit-coin.github.io/beta/) - test some new features.
 
-[Developer version](https://aqoleg/github.io/pitcoin) - simplified version.
+[Developer version](https://aqoleg.github.io/pitcoin) - simplified version.
 
 [Decentralized web version](https://arweave.net/M7bt9_JTqGIbjZgFL5J-xYm-HlwjSIsMeUOQC79_sP4) - unstoppable immutable copy.
 
