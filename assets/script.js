@@ -118,6 +118,8 @@
     var contract = null;
     var account = null;
     var accountTokens = null;
+    var lock0 = false;
+    var lock1 = false;
 
     window.onload = function () {
         document.getElementById('eth').onclick = function () {
@@ -730,10 +732,12 @@
                 balance = new BigNumber(balance).shiftedBy(-18);
                 printValue(balance, document.getElementById('contractBalance'));
             }).catch(error);
-        } else {
+        } else if (!lock0) {
+            lock0 = true;
             tronWeb.trx.getUnconfirmedBalance(contract.address).then(function (balance) {
                 balance = new BigNumber(balance).shiftedBy(-6);
                 printValue(balance, document.getElementById('contractBalance'));
+                lock0 = false;
             }).catch(error);
         }
     }
@@ -781,20 +785,23 @@
                     document.getElementById('reflink').innerHTML = '';
                 }
             }).catch(error);
-        } else {
+        } else if (!lock1) {
+            lock1 = true;
             contract.refDividendsOf(account).call().then(function (dividends) {
-                refDividend = new BigNumber(dividends).shiftedBy(-18);
+                refDividend = new BigNumber(dividends._hex).shiftedBy(-18);
                 printValue(refDividend, document.getElementById('refDividend'));
                 return contract.dividendsOf(account).call();
             }).then(function (dividends) {
-                if (dividends == '1') {
+                dividends = dividends._hex;
+                if (dividends == '0x01') {
                     dividends = '0';
                 }
                 dividends = new BigNumber(dividends).shiftedBy(-18).plus(refDividend);
                 printValue(dividends, document.getElementById('dividend'));
+                lock1 = false;
             }).catch(error);
             contract.balanceOf(account).call().then(function (balance) {
-                accountTokens = new BigNumber(balance).shiftedBy(-18);
+                accountTokens = new BigNumber(balance._hex).shiftedBy(-18);
                 printValue(accountTokens, document.getElementById('balance'));
                 if (accountTokens >= 1000) {
                     var link = 'pitcoin.network?trx=' + account;
