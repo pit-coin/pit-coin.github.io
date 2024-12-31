@@ -1,14 +1,16 @@
-'use strict';
-
 (function () {
+    'use strict';
+
     var ethAddress = '0x99cbe93AFee15456a1115540e7F534F6629bAB3f';
     var ropstenAddress = '0x6342A5c056F71E7E3a6Bf89560Dc1F97210bDb51';
     var goerliAddress = '0x6011b6573fA152ded3d3188Ee6a90842BEa38b42';
+    var plsAddress = '0x99cbe93AFee15456a1115540e7F534F6629bAB3f';
     var tronAddress = 'TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97';
     var shastaAddress = 'TKd1M1kRJ2gJV5KwTphxE9a7jPNHztZzc7';
     var networkEth = 1;
     var networkRopsten = 3;
     var networkGoerli = 5;
+    var networkPls = 369;
     var networkTron = 'https://api.trongrid.io';
     var networkTronStack = 'https://api.tronstack.io';
     var networkShasta = 'https://api.shasta.trongrid.io';
@@ -113,6 +115,7 @@
     ];
 
     var eth = false;
+    var pls = false; 
     var web3loaded = false;
     var network = null;
     var contract = null;
@@ -122,8 +125,11 @@
     var lock1 = false;
 
     window.onload = function () {
+        document.getElementById('pls').onclick = function () {
+            setEth(true, true);
+        };
         document.getElementById('eth').onclick = function () {
-            setEth(true);
+            setEth(true, false);
         };
         document.getElementById('trx').onclick = function () {
             setEth(false);
@@ -144,7 +150,7 @@
         }
         if (window.ethereum) {
             var script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js';
+            script.src = 'assets/web3.min.js';
             script.onload = function () {
                 web3loaded = true;
                 window.web3 = new Web3(ethereum);
@@ -166,7 +172,7 @@
             };
             document.body.appendChild(script);
         }
-        setEth(false);
+        setEth(false, false);
 
         document.getElementById('buyValue').onkeyup = function (event) {
             if (event.keyCode === 13) {
@@ -186,16 +192,22 @@
         };
     };
 
-    function setEth(isEth) {
+    function setEth(isEth, isPls) {
         eth = isEth;
+        pls = isPls;
         network = null;
         contract = null;
         account = null;
-        document.getElementById('eth').className = eth ? 'active' : '';
+        document.getElementById('eth').className = eth && !pls ? 'active' : '';
+        document.getElementById('pls').className = pls ? 'active' : '';
         document.getElementById('trx').className = eth ? '' : 'active';
         var list = document.getElementsByClassName('currency');
         for (var i = 0; i < list.length; i++) {
-            list[i].innerHTML = eth ? 'ETH' : 'TRX';
+            if (!eth) {
+                list[i].innerHTML = 'TRX';
+            } else {
+                list[i].innerHTML = pls ? 'PLS' : 'ETH';
+            }
         }
         document.getElementById('erc').innerHTML = eth ? 'ERC' : 'TRC';
         document.getElementById('price').innerHTML = eth ? '0.1' : '1';
@@ -205,7 +217,7 @@
         clearLogs();
         if (eth) {
             if (!window.ethereum) {
-                printContractLink(networkEth);
+                printContractLink(pls ? networkPls : networkEth);
                 document.getElementById('startMessage').innerHTML = 'install ' +
                     '<a target="_blank" rel="noopener" href="https://metamask.io/download.html">' +
                     'metamask</a> or use ' +
@@ -234,7 +246,20 @@
         if (eth) {
             web3.eth.getChainId().then(function (newNetwork) {
                 newNetwork = Number(newNetwork);
-                if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
+                if (pls) {
+                    if (newNetwork !== networkPls) {
+                        network = null;
+                        account = null;
+                        document.getElementById('connect').style.display = 'block';
+                        document.getElementById('startMessage').innerHTML =
+                            'switch to pulsechain network';
+                        printContractLink(networkPls);
+                        clearContractBalance();
+                        clearAccount();
+                        clearLogs();
+                        return;
+                    }
+                } else if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
                     newNetwork !== networkGoerli) {
                     network = null;
                     account = null;
@@ -256,6 +281,8 @@
                         contract = new web3.eth.Contract(abi, ropstenAddress);
                     } else if (network === networkGoerli) {
                         contract = new web3.eth.Contract(abi, goerliAddress);
+                    } else if (network === networkPls) {
+                        contract = new web3.eth.Contract(abi, plsAddress);
                     }
                     document.getElementById('startMessage').innerHTML = '';
                     printContractLink(network);
@@ -390,7 +417,11 @@
             }).then(function (newNetwork) {
                 stopLoading();
                 newNetwork = Number(newNetwork);
-                if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
+                if (pls) {
+                    if (newNetwork !== networkPls) {
+                        alert('switch to the pulsechain network');
+                    }
+                } else if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
                     newNetwork !== networkGoerli) {
                     alert('switch to the main, ropsten or goerli network');
                 }
@@ -424,7 +455,7 @@
             balance = new BigNumber(balance).shiftedBy(eth ? -18 : -6);
             if (balance.isZero()) {
                 document.getElementById('buyValueHint').innerHTML = 'you have no ' +
-                    (eth ? 'eth' : 'trx');
+                    (pls ? 'pls' : (eth ? 'eth' : 'trx'));
                 stopLoading();
                 return;
             } else if (value.isGreaterThan(balance)) {
@@ -452,7 +483,7 @@
             if (eth) {
                 if (ref) {
                     contract.methods.balanceOf(ref).call().then(function (balance) {
-                        if (new BigNumber(balance).shiftedBy(-18).isLessThan(10)) {
+                        if (new BigNumber(balance).shiftedBy(-18).isLessThan(pls ? 10 : 10)) {
                             console.log('not a ref');
                             ref = '0x0000000000000000000000000000000000000000';
                         }
@@ -473,7 +504,7 @@
                 value: value.shiftedBy(18)
             }).on('transactionHash', function (hash) {
                 document.getElementById('buyValue').value = '';
-                message = logTx('purchase for ' + value + ' ETH', hash);
+                message = logTx('purchase for ' + value + (pls ? ' PLS' : ' ETH'), hash);
                 stopLoading();
             }).on('confirmation', function (confirmationNumber, receipt) {
                 if (confirmationNumber != 0) {
@@ -501,7 +532,7 @@
             }).catch(error);
         }
     }
-
+    
     function sell() {
         document.getElementById('sellValueHint').innerHTML = '';
         if (!check()) {
@@ -633,7 +664,11 @@
             alert('open tronlink');
         } else if (!network) {
             if (eth) {
-                alert('switch to the main, ropsten or goerli network');
+                if (pls) {
+                    alert('switch to the pulsechain network');
+                } else {
+                    alert('switch to the main, ropsten or goerli network');
+                }
             } else {
                 alert('switch to the main or shasta network');
             }
@@ -707,6 +742,10 @@
                 document.getElementById('contract').innerHTML = goerliAddress;
                 document.getElementById('contract').href =
                     'https://goerli.etherscan.io/address/' + goerliAddress;
+            } else if (network === networkPls) {
+                document.getElementById('contract').innerHTML = plsAddress;
+                document.getElementById('contract').href =
+                    'https://otter.pulsechain.com/address/' + plsAddress;
             }
         } else {
             if (network === networkTron || network === networkTronStack) {
@@ -762,24 +801,24 @@
         var refDividend;
         if (eth) {
             contract.methods.refDividendsOf(account).call().then(function (dividends) {
-                refDividend = new BigNumber(dividends).shiftedBy(-19);
+                refDividend = new BigNumber(dividends).shiftedBy(pls ? -19 : -19);
                 printValue(refDividend, document.getElementById('refDividend'));
                 return contract.methods.dividendsOf(account).call();
             }).then(function (dividends) {
                 if (dividends == '1') {
                     dividends = '0';
                 }
-                dividends = new BigNumber(dividends).shiftedBy(-19).plus(refDividend);
+                dividends = new BigNumber(dividends).shiftedBy(pls ? -19 : -19).plus(refDividend);
                 printValue(dividends, document.getElementById('dividend'));
             }).catch(error);
             contract.methods.balanceOf(account).call().then(function (balance) {
                 accountTokens = new BigNumber(balance).shiftedBy(-18);
                 printValue(accountTokens, document.getElementById('balance'));
                 if (accountTokens >= 10) {
-                    var link = 'pitcoin.network?eth=' + account;
+                    var link = window.location.hostname + window.location.pathname + '?eth=' + account;
                     document.getElementById('ref').style.display = 'block';
                     document.getElementById('reflink').innerHTML = '<a target="_blank" rel="noopener" ' +
-                        'href="http://' + link + '">' + link + '</a>';
+                        'href="https://' + link + '">' + link + '</a>';
                 } else {
                     document.getElementById('ref').style.display = 'none';
                     document.getElementById('reflink').innerHTML = '';
@@ -833,6 +872,8 @@
                 p.innerHTML = 'ethereum ropsten test network';
             } else if (network === networkGoerli) {
                 p.innerHTML = 'ethereum goerli test network';
+            } else if (network === networkPls) {
+                p.innerHTML = 'pulsechain mainnet';
             }
         } else {
             if (network === networkTron || network === networkTronStack) {
@@ -859,6 +900,8 @@
                 a.href = 'https://ropsten.etherscan.io/address/' + account;
             } else if (network === networkGoerli) {
                 a.href = 'https://goerli.etherscan.io/address/' + account;
+            } else if (network === networkPls) {
+                a.href = 'https://otter.pulsechain.com/address/' + account;
             }
         } else {
             a.innerHTML = account;
@@ -890,6 +933,8 @@
                 a.href = 'https://ropsten.etherscan.io/tx/' + hash;
             } else if (network === networkGoerli) {
                 a.href = 'https://goerli.etherscan.io/tx/' + hash;
+            } else if (network === networkPls) {
+                a.href = 'https://otter.pulsechain.com/tx/' + hash;
             }
         } else {
             if (network === networkTron || network === networkTronStack) {
