@@ -423,13 +423,34 @@
                 newNetwork = Number(newNetwork);
                 if (pls) {
                     if (newNetwork !== networkPls && newNetwork !== networkPlsTestnet) {
-                        alert('switch to the pulsechain network');
+                        return ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{chainId: '0x171'}]
+                        });
                     }
                 } else if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
                     newNetwork !== networkGoerli) {
-                    alert('switch to the main, ropsten or goerli network');
+                    return ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{chainId: '0x1'}]
+                    });
                 }
-            }).catch(error);
+            }).catch(function (error) {
+                if (error.code === 4902) {
+                    ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: '0x171',
+                            chainName: 'PulseChain',
+                            nativeCurrency: {symbol: 'PLS', decimals: 18},
+                            rpcUrls: ['https://rpc.pulsechain.com'],
+                            blockExplorerUrls: ['https://otter.pulsechain.com']
+                        }]
+                    }).then(function () {
+                        connect();
+                    }).catch(error);
+                }
+            });
         }
     }
 
