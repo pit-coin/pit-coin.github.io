@@ -5,12 +5,14 @@
     var ropstenAddress = '0x6342A5c056F71E7E3a6Bf89560Dc1F97210bDb51';
     var goerliAddress = '0x6011b6573fA152ded3d3188Ee6a90842BEa38b42';
     var plsAddress = '0x99cbe93AFee15456a1115540e7F534F6629bAB3f';
+    var plsTestnetAddress = '0x429791801b8FDc5525e008c7a98c96CaCF5eEea3';
     var tronAddress = 'TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97';
     var shastaAddress = 'TKd1M1kRJ2gJV5KwTphxE9a7jPNHztZzc7';
     var networkEth = 1;
     var networkRopsten = 3;
     var networkGoerli = 5;
     var networkPls = 369;
+    var networkPlsTestnet = 943;
     var networkTron = 'https://api.trongrid.io';
     var networkTronStack = 'https://api.tronstack.io';
     var networkShasta = 'https://api.shasta.trongrid.io';
@@ -115,7 +117,7 @@
     ];
 
     var eth = false;
-    var pls = false; 
+    var pls = false;
     var web3loaded = false;
     var network = null;
     var contract = null;
@@ -247,7 +249,7 @@
             web3.eth.getChainId().then(function (newNetwork) {
                 newNetwork = Number(newNetwork);
                 if (pls) {
-                    if (newNetwork !== networkPls) {
+                    if (newNetwork !== networkPls && newNetwork !== networkPlsTestnet) {
                         network = null;
                         account = null;
                         document.getElementById('connect').style.display = 'block';
@@ -283,6 +285,8 @@
                         contract = new web3.eth.Contract(abi, goerliAddress);
                     } else if (network === networkPls) {
                         contract = new web3.eth.Contract(abi, plsAddress);
+                    } else if (network === networkPlsTestnet) {
+                        contract = new web3.eth.Contract(abi, plsTestnetAddress);
                     }
                     document.getElementById('startMessage').innerHTML = '';
                     printContractLink(network);
@@ -418,7 +422,7 @@
                 stopLoading();
                 newNetwork = Number(newNetwork);
                 if (pls) {
-                    if (newNetwork !== networkPls) {
+                    if (newNetwork !== networkPls && newNetwork !== networkPlsTestnet) {
                         alert('switch to the pulsechain network');
                     }
                 } else if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
@@ -746,6 +750,10 @@
                 document.getElementById('contract').innerHTML = plsAddress;
                 document.getElementById('contract').href =
                     'https://otter.pulsechain.com/address/' + plsAddress;
+            } else if (network === networkPlsTestnet) {
+                document.getElementById('contract').innerHTML = plsTestnetAddress;
+                document.getElementById('contract').href =
+                    'https://scan.v4.testnet.pulsechain.com/#/address/' + plsTestnetAddress;
             }
         } else {
             if (network === networkTron || network === networkTronStack) {
@@ -874,6 +882,8 @@
                 p.innerHTML = 'ethereum goerli test network';
             } else if (network === networkPls) {
                 p.innerHTML = 'pulsechain mainnet';
+            } else if (network === networkPlsTestnet) {
+                p.innerHTML = 'pulsechain testnet';
             }
         } else {
             if (network === networkTron || network === networkTronStack) {
@@ -902,6 +912,8 @@
                 a.href = 'https://goerli.etherscan.io/address/' + account;
             } else if (network === networkPls) {
                 a.href = 'https://otter.pulsechain.com/address/' + account;
+            } else if (network === networkPlsTestnet) {
+                a.href = 'https://scan.v4.testnet.pulsechain.com/#/address/' + account;
             }
         } else {
             a.innerHTML = account;
@@ -935,6 +947,8 @@
                 a.href = 'https://goerli.etherscan.io/tx/' + hash;
             } else if (network === networkPls) {
                 a.href = 'https://otter.pulsechain.com/tx/' + hash;
+            } else if (network === networkPlsTestnet) {
+                a.href = 'https://scan.v4.testnet.pulsechain.com/#/tx/' + hash;
             }
         } else {
             if (network === networkTron || network === networkTronStack) {
