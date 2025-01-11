@@ -4,7 +4,7 @@
     var ethAddress = '0x99cbe93AFee15456a1115540e7F534F6629bAB3f';
     var ropstenAddress = '0x6342A5c056F71E7E3a6Bf89560Dc1F97210bDb51';
     var goerliAddress = '0x6011b6573fA152ded3d3188Ee6a90842BEa38b42';
-    var plsAddress = '0x99cbe93AFee15456a1115540e7F534F6629bAB3f';
+    var plsAddress = '0x429791801b8FDc5525e008c7a98c96CaCF5eEea3';
     var plsTestnetAddress = '0x429791801b8FDc5525e008c7a98c96CaCF5eEea3';
     var tronAddress = 'TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97';
     var shastaAddress = 'TKd1M1kRJ2gJV5KwTphxE9a7jPNHztZzc7';
@@ -116,9 +116,8 @@
         }
     ];
 
-    var eth = false;
-    var pls = false;
-    var web3loaded = false;
+    var eth = true;
+    var pls = true;
     var network = null;
     var contract = null;
     var account = null;
@@ -128,13 +127,13 @@
 
     window.onload = function () {
         document.getElementById('pls').onclick = function () {
-            setEth(true, true);
+            setNetwork(true, true);
         };
         document.getElementById('eth').onclick = function () {
-            setEth(true, false);
+            setNetwork(true, false);
         };
         document.getElementById('trx').onclick = function () {
-            setEth(false);
+            setNetwork(false, false);
         };
         document.getElementById('connect').onclick = connect;
         document.getElementById('buy').onclick = buy;
@@ -143,7 +142,6 @@
         document.getElementById('withdraw').onclick = withdraw;
 
         if (window.tronWeb) {
-            load();
             addEventListener('message', function (event) {
                 if (event.data.message && !eth) {
                     load();
@@ -151,30 +149,21 @@
             });
         }
         if (window.ethereum) {
-            var script = document.createElement('script');
-            script.src = 'assets/web3.min.js';
-            script.onload = function () {
-                web3loaded = true;
-                window.web3 = new Web3(ethereum);
-                if (eth) {
-                    load();
-                }
-                if (ethereum.on) {
-                    ethereum.on('chainChanged', function () {
-                        if (eth) {
-                            load();
-                        }
-                    });
-                    ethereum.on('accountsChanged', function () {
-                        if (eth) {
-                            load();
-                        }
-                    });
-                }
-            };
-            document.body.appendChild(script);
+            window.web3 = new Web3(ethereum);
+            if (ethereum.on) {
+                ethereum.on('chainChanged', function () {
+                    if (eth) {
+                        load();
+                    }
+                });
+                ethereum.on('accountsChanged', function () {
+                    if (eth) {
+                        load();
+                    }
+                });
+            }
         }
-        setEth(false, false);
+        load();
 
         document.getElementById('buyValue').onkeyup = function (event) {
             if (event.keyCode === 13) {
@@ -194,7 +183,7 @@
         };
     };
 
-    function setEth(isEth, isPls) {
+    function setNetwork(isEth, isPls) {
         eth = isEth;
         pls = isPls;
         network = null;
@@ -212,8 +201,8 @@
             }
         }
         document.getElementById('erc').innerHTML = eth ? 'ERC' : 'TRC';
-        document.getElementById('price').innerHTML = eth ? '0.1' : '1';
-        document.getElementById('refAmount').innerHTML = eth ? '10' : '1000';
+        document.getElementById('price').innerHTML = eth && !pls ? '0.1' : '1';
+        document.getElementById('refAmount').innerHTML = eth && !pls ? '10' : '1000';
         clearContractBalance();
         clearAccount();
         clearLogs();
@@ -224,9 +213,6 @@
                     '<a target="_blank" rel="noopener" href="https://metamask.io/download.html">' +
                     'metamask</a> or use ' +
                     '<a target="_blank" rel="noopener" href="https://opera.com">opera</a>';
-            } else if (!web3loaded) {
-                printContractLink(networkEth);
-                document.getElementById('startMessage').innerHTML = 'loading...';
             } else {
                 load();
             }
@@ -426,14 +412,14 @@
                         return ethereum.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{chainId: '0x171'}]
-                        });
+                        }).then(load);
                     }
                 } else if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
                     newNetwork !== networkGoerli) {
                     return ethereum.request({
                         method: 'wallet_switchEthereumChain',
                         params: [{chainId: '0x1'}]
-                    });
+                    }).then(load);
                 }
             }).catch(function (error) {
                 if (error.code === 4902) {
@@ -681,8 +667,6 @@
     function check() {
         if (eth && !window.ethereum) {
             alert('ethereum is not supported');
-        } else if (eth && !web3loaded) {
-            alert('loading...');
         } else if (!eth && !window.tronWeb) {
             alert('tron is not supported');
         } else if (!eth && !tronWeb.defaultAddress.base58) {
@@ -830,14 +814,14 @@
         var refDividend;
         if (eth) {
             contract.methods.refDividendsOf(account).call().then(function (dividends) {
-                refDividend = new BigNumber(dividends).shiftedBy(pls ? -19 : -19);
+                refDividend = new BigNumber(dividends).shiftedBy(pls ? -18 : -19);
                 printValue(refDividend, document.getElementById('refDividend'));
                 return contract.methods.dividendsOf(account).call();
             }).then(function (dividends) {
                 if (dividends == '1') {
                     dividends = '0';
                 }
-                dividends = new BigNumber(dividends).shiftedBy(pls ? -19 : -19).plus(refDividend);
+                dividends = new BigNumber(dividends).shiftedBy(pls ? -18 : -19).plus(refDividend);
                 printValue(dividends, document.getElementById('dividend'));
             }).catch(error);
             contract.methods.balanceOf(account).call().then(function (balance) {
