@@ -1,49 +1,46 @@
 <!DOCTYPE html>
-<!-- 1.4.0 -->
+<!-- 1.5.0 -->
 <html lang="en">
     <head>
         <title>PITcoin Bond</title>
 
         <meta charset="utf-8" />
         <meta name="description"
-              content="Erc20 ethereum and trc20 tron tokens with fixed price of 0.1 eth or 1 trx.
-                       Buy/sell 10% fee, transfer 5% fee, fee is distributed among all holders.
-                       Referral bonus 3% for holders with more than 10 eth pit or 1000 trx pit.
+              content="Erc20 ethereum/pulsechain and trc20 tron tokens
+                       with fixed price of 1 pls, 0.1 eth or 1 trx.
+                       Buy/sell 10% fee, transfer 5% fee. Fee is distributed among all holders.
+                       Referral bonus 3% for holders with more than 100 pls pit, 10 eth pit or 1000 trx pit.
                        No owners and administrators." />
         <meta name="keywords" content="BlockchainForWhatIsBest pitcoin bond network" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#F7A219" />
 
         <link rel="icon" href="assets/196.png" />
-        <link rel="stylesheet" href="assets/style.css?1.4.0" />
+        <link rel="stylesheet" href="assets/style.css?1.5.0" />
     </head>
     <body>
         <div id="noFooter">
             <div id="header">
                 <div id="logo"><div></div></div>
                 <div id="headerButtons">
-                    <button id="trx" type="button">TRX</button>
-                    <button id="eth" type="button">ETH</button>
-                    <button id="pls" type="button" class="active">PLS</button>
-                    <button id="connect" type="button">CONNECT</button>
+                    <button id="trx">TRX</button>
+                    <button id="eth">ETH</button>
+                    <button id="pls" class="active">PLS</button>
+                    <button id="connect">CONNECT</button>
                 </div>
             </div>
             <p id="startMessage"></p>
             <h1>PITcoin Bond</h1>
-            <p>Fully <span id="erc">ERC</span>20-compliant token</p>
-            <p class="onestring">Contract
-                <a id="contract"
+            <p>Contract
+                <a id="contract" class="onestring"
                    href="https://otter.pulsechain.com/address/0x429791801b8FDc5525e008c7a98c96CaCF5eEea3"
                    target="_blank" rel="noopener">0x429791801b8FDc5525e008c7a98c96CaCF5eEea3</a>
             </p>
             <p>Contract balance <span id="contractBalance">...</span> <span class="currency">PLS</span></p>
             <p>Fixed price <span id="price">1</span> <span class="currency">PLS</span>/PIT</p>
             <p>Buy: 10% fee - Sell: 10% fee - Transfer: 5% fee - Withdraw and Reinvest: No Fee</p>
-            <p>
-                Referral Bonus: 3% Minimal amount required to receive referral bonuses =
-                <span id="refAmount">1000</span>
-                PIT
-            </p>
+            <p>Referral Bonus: 3% Minimal amount required to receive referral bonuses =
+                <span id="refAmount">1000</span> PIT</p>
             <p>No owners, administrators or GOVERNANCE. Enjoy!</p>
             <h2>Your balance <span id="balance">...</span> PIT</h2>
             <p>Buy and sell PIT</p>
@@ -54,7 +51,7 @@
                         <span id="buyValueHint" class="hint"></span>
                         <input id="buyValue" type="text" maxlength="22" />
                     </label>
-                    <button id="buy" type="button">Buy</button>
+                    <button id="buy">Buy</button>
                 </div>
                 <div class="half">
                     <label>
@@ -62,7 +59,7 @@
                         <span id="sellValueHint" class="hint"></span>
                         <input id="sellValue" type="text" maxlength="25" />
                     </label>
-                    <button id="sell" type="button">Sell</button>
+                    <button id="sell">Sell</button>
                 </div>
             </div>
             <h2>
@@ -96,8 +93,7 @@
             </div>
         </div>
         <div id="loading"><div></div></div>
-        <script src="assets/bignumber.min.js"></script>
-        <script src="assets/web3.min.js"></script>
-        <script src="assets/script.js?1.4.0"></script>
+        <script src="assets/ethers.js"></script>
+        <script src="assets/script.js"></script>
     </body>
 </html>

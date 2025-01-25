@@ -1,170 +1,106 @@
 (function () {
     'use strict';
 
-    var ethAddress = '0x99cbe93AFee15456a1115540e7F534F6629bAB3f';
-    var ropstenAddress = '0x6342A5c056F71E7E3a6Bf89560Dc1F97210bDb51';
-    var goerliAddress = '0x6011b6573fA152ded3d3188Ee6a90842BEa38b42';
-    var plsAddress = '0x429791801b8FDc5525e008c7a98c96CaCF5eEea3';
-    var plsTestnetAddress = '0x429791801b8FDc5525e008c7a98c96CaCF5eEea3';
-    var tronAddress = 'TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97';
-    var shastaAddress = 'TKd1M1kRJ2gJV5KwTphxE9a7jPNHztZzc7';
-    var networkEth = 1;
-    var networkRopsten = 3;
-    var networkGoerli = 5;
-    var networkPls = 369;
-    var networkPlsTestnet = 943;
-    var networkTron = 'https://api.trongrid.io';
-    var networkTronStack = 'https://api.tronstack.io';
-    var networkShasta = 'https://api.shasta.trongrid.io';
+    var eth = {
+        name: 'Ethereum mainnet',
+        isEth: true,
+        chainId: 1,
+        address: '0x99cbe93AFee15456a1115540e7F534F6629bAB3f',
+        coin: 'ETH',
+        contractLink: 'https://etherscan.io/token/',
+        addressLink: 'https://etherscan.io/address/',
+        txLink: 'https://etherscan.io/tx/',
+        pitPrice: 0.1,
+        pitRefRequirement: 10
+    };
+    var ethTest = {
+        name: 'Ethereum Goerli testnet',
+        isEth: true,
+        chainId: 5,
+        address: '0x6011b6573fA152ded3d3188Ee6a90842BEa38b42',
+        coin: 'goETH',
+        contractLink: 'https://goerli.etherscan.io/token',
+        addressLink: 'https://goerli.etherscan.io/address',
+        txLink: 'https://goerli.etherscan.io/tx',
+        pitPrice: 0.1,
+        pitRefRequirement: 10
+    };
+    var pls = {
+        name: 'Pulsechain mainnet',
+        isEth: true,
+        chainId: 369,
+        address: '0x429791801b8FDc5525e008c7a98c96CaCF5eEea3',
+        coin: 'PLS',
+        contractLink: 'https://otter.pulsechain.com/address/',
+        addressLink: 'https://otter.pulsechain.com/address/',
+        txLink: 'https://otter.pulsechain.com/tx/',
+        pitPrice: 1,
+        pitRefRequirement: 1000
+    };
+    var plsTest = {
+        name: 'Pulsechain testnet',
+        isEth: true,
+        chainId: 943,
+        address: '0x429791801b8FDc5525e008c7a98c96CaCF5eEea3',
+        coin: 'tPLS',
+        contractLink: 'https://scan.v4.testnet.pulsechain.com/#/token/',
+        addressLink: 'https://scan.v4.testnet.pulsechain.com/#/address/',
+        txLink: 'https://scan.v4.testnet.pulsechain.com/#/tx/',
+        pitPrice: 1,
+        pitRefRequirement: 1000
+    };
+    var trx = {
+        name: 'Tron',
+        isEth: false,
+        chainId: 'https://api.trongrid.io',
+        address: 'TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97',
+        coin: 'TRX',
+        contractLink: 'https://tronscan.org/#/contract/',
+        addressLink: 'https://tronscan.org/#/address/',
+        txLink: 'https://tronscan.org/#/tx/',
+        pitPrice: 1,
+        pitRefRequirement: 1000
+    };
+    var trxTest = {
+        name: 'Tron Shasta testnet',
+        isEth: false,
+        chainId: 'https://api.shasta.trongrid.io',
+        address: 'TKd1M1kRJ2gJV5KwTphxE9a7jPNHztZzc7',
+        coin: 'tTRX',
+        contractLink: 'https://shasta.tronscan.org/#/contract/',
+        addressLink: 'https://shasta.tronscan.org/#/address/',
+        txLink: 'https://shasta.tronscan.org/#/tx/',
+        pitPrice: 1,
+        pitRefRequirement: 1000
+    };
     var abi = [
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "",
-                    "type": "address"
-                }
-            ],
-            "name": "balanceOf",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "_ref",
-                    "type": "address"
-                }
-            ],
-            "name": "buy",
-            "outputs": [],
-            "stateMutability": "payable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "_owner",
-                    "type": "address"
-                }
-            ],
-            "name": "dividendsOf",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "",
-                    "type": "address"
-                }
-            ],
-            "name": "refDividendsOf",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "reinvest",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "_tokens",
-                    "type": "uint256"
-                }
-            ],
-            "name": "sell",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "withdraw",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        }
+        'function balanceOf(address) view returns (uint256)',
+        'function refDividendsOf(address) view returns (uint256)',
+        'function dividendsOf(address) view returns (uint256)',
+        'function buy(address) payable',
+        'function sell(uint256)',
+        'function withdraw()',
+        'function reinvest()',
+        'event Withdraw(address indexed, uint256)',
+        'event Transfer(address indexed, address indexed, uint256)'
     ];
-
-    var eth = true;
-    var pls = true;
-    var network = null;
-    var contract = null;
-    var account = null;
-    var accountTokens = null;
-    var lock0 = false;
-    var lock1 = false;
+    var page, chain, account, ethProvider, ethContract, trxProvider, trxContract;
 
     window.onload = function () {
         document.getElementById('pls').onclick = function () {
-            setNetwork(true, true);
+            openPage(pls);
         };
         document.getElementById('eth').onclick = function () {
-            setNetwork(true, false);
+            openPage(eth);
         };
         document.getElementById('trx').onclick = function () {
-            setNetwork(false, false);
+            openPage(trx);
         };
         document.getElementById('connect').onclick = connect;
         document.getElementById('buy').onclick = buy;
         document.getElementById('sell').onclick = sell;
         document.getElementById('reinvest').onclick = reinvest;
         document.getElementById('withdraw').onclick = withdraw;
-
-        if (window.tronWeb) {
-            addEventListener('message', function (event) {
-                if (event.data.message && !eth) {
-                    load();
-                }
-            });
-        }
-        if (window.ethereum) {
-            window.web3 = new Web3(ethereum);
-            if (ethereum.on) {
-                ethereum.on('chainChanged', function () {
-                    if (eth) {
-                        load();
-                    }
-                });
-                ethereum.on('accountsChanged', function () {
-                    if (eth) {
-                        load();
-                    }
-                });
-            }
-        }
-        load();
-
         document.getElementById('buyValue').onkeyup = function (event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
@@ -181,539 +117,496 @@
                 document.getElementById('sellValue').value = '';
             }
         };
+
+        openPage(pls);
     };
 
-    function setNetwork(isEth, isPls) {
-        eth = isEth;
-        pls = isPls;
-        network = null;
-        contract = null;
+    function openPage(newPage) {
+        page = newPage;
+        chain = null;
         account = null;
-        document.getElementById('eth').className = eth && !pls ? 'active' : '';
-        document.getElementById('pls').className = pls ? 'active' : '';
-        document.getElementById('trx').className = eth ? '' : 'active';
-        var list = document.getElementsByClassName('currency');
-        for (var i = 0; i < list.length; i++) {
-            if (!eth) {
-                list[i].innerHTML = 'TRX';
-            } else {
-                list[i].innerHTML = pls ? 'PLS' : 'ETH';
-            }
-        }
-        document.getElementById('erc').innerHTML = eth ? 'ERC' : 'TRC';
-        document.getElementById('price').innerHTML = eth && !pls ? '0.1' : '1';
-        document.getElementById('refAmount').innerHTML = eth && !pls ? '10' : '1000';
-        clearContractBalance();
-        clearAccount();
-        clearLogs();
-        if (eth) {
-            if (!window.ethereum) {
-                printContractLink(pls ? networkPls : networkEth);
-                document.getElementById('startMessage').innerHTML = 'install ' +
-                    '<a target="_blank" rel="noopener" href="https://metamask.io/download.html">' +
-                    'metamask</a> or use ' +
-                    '<a target="_blank" rel="noopener" href="https://opera.com">opera</a>';
-            } else {
-                load();
-            }
+        document.getElementById('eth').className = page === eth ? 'active' : '';
+        document.getElementById('pls').className = page === pls ? 'active' : '';
+        document.getElementById('trx').className = page === trx ? 'active' : '';
+        printMessage();
+        initPage();
+        if (page.isEth) {
+            setEth();
         } else {
-            document.getElementById('connect').style.display = 'none';
-            if (!window.tronWeb) {
-                printContractLink(networkTron);
-                document.getElementById('startMessage').innerHTML = 'install ' +
-                    '<a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/' +
-                    'detail/tronlink/ibnejdfjmmkpcnlpebklmnkoeoihofec">tronlink</a> or use ' +
-                    '<a target="_blank" rel="noopener" href="https://opera.com">opera</a> mobile';
-            } else {
-                load();
-            }
+            setTrx();
         }
     }
 
-    function load() {
-        if (eth) {
-            web3.eth.getChainId().then(function (newNetwork) {
-                newNetwork = Number(newNetwork);
-                if (pls) {
-                    if (newNetwork !== networkPls && newNetwork !== networkPlsTestnet) {
-                        network = null;
-                        account = null;
-                        document.getElementById('connect').style.display = 'block';
-                        document.getElementById('startMessage').innerHTML =
-                            'switch to pulsechain network';
-                        printContractLink(networkPls);
-                        clearContractBalance();
-                        clearAccount();
-                        clearLogs();
-                        return;
-                    }
-                } else if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
-                    newNetwork !== networkGoerli) {
-                    network = null;
-                    account = null;
-                    document.getElementById('connect').style.display = 'block';
-                    document.getElementById('startMessage').innerHTML =
-                        'switch to the main, ropsten or goerli network';
-                    printContractLink(networkEth);
-                    clearContractBalance();
-                    clearAccount();
-                    clearLogs();
+    function setEth() {
+        if (!page.isEth) {
+            return;
+        } else if (!window.ethereum) {
+            document.getElementById('connect').style.display = 'none';
+            return printMessage('use ethereum browser');
+        } else if (!ethProvider) {
+            ethProvider = new ethers.providers.Web3Provider(ethereum, 'any');
+            if (ethereum.on) {
+                ethereum.on('chainChanged', setEth);
+                ethereum.on('accountsChanged', setEth);
+            }
+        }
+
+        ethProvider.getNetwork().then(function (newChainId) {
+            if (!page.isEth) {
+                return;
+            }
+            newChainId = Number(newChainId.chainId);
+            if (page === eth && newChainId !== eth.chainId && newChainId !== ethTest.chainId) {
+                chain = null;
+                account = null;
+                initPage();
+                document.getElementById('connect').style.display = 'block';
+                return printMessage('switch to ethereum mainnet or goerli testnet');
+            } else if (page === pls && newChainId !== pls.chainId && newChainId !== plsTest.chainId) {
+                chain = null;
+                account = null;
+                initPage();
+                document.getElementById('connect').style.display = 'block';
+                return printMessage('switch to pulsechain mainnet or testnet');
+            }
+            if (!chain || chain.chainId !== newChainId) {
+                if (newChainId === eth.chainId) {
+                    chain = eth;
+                } else if (newChainId === ethTest.chainId) {
+                    chain = ethTest;
+                } else if (newChainId === pls.chainId) {
+                    chain = pls;
+                } else if (newChainId === plsTest.chainId) {
+                    chain = plsTest;
+                }
+                account = null;
+                ethContract = new ethers.Contract(chain.address, abi, ethProvider.getSigner());
+                ethContract.on('Transfer', loadEth);
+                ethContract.on('Withdraw', loadEth);
+                initPage();
+            }
+            setAccount();
+        }).catch(error);
+
+        function setAccount() {
+            ethProvider.getSigner().getAddress().then(function (newAccount) {
+                if (!chain || !chain.isEth) {
                     return;
-                }
-                if (network !== newNetwork) {
-                    network = newNetwork;
-                    account = null;
-                    if (network === networkEth) {
-                        contract = new web3.eth.Contract(abi, ethAddress);
-                    } else if (network === networkRopsten) {
-                        contract = new web3.eth.Contract(abi, ropstenAddress);
-                    } else if (network === networkGoerli) {
-                        contract = new web3.eth.Contract(abi, goerliAddress);
-                    } else if (network === networkPls) {
-                        contract = new web3.eth.Contract(abi, plsAddress);
-                    } else if (network === networkPlsTestnet) {
-                        contract = new web3.eth.Contract(abi, plsTestnetAddress);
-                    }
-                    document.getElementById('startMessage').innerHTML = '';
-                    printContractLink(network);
-                    clearContractBalance();
-                    loadContractBalance();
-                    clearLogs();
-                    contract.events.allEvents().on('data', function () {
-                        if (eth && network) {
-                            loadContractBalance();
-                            if (account) {
-                                loadAccount();
-                            }
-                        }
-                    });
-                }
-
-                web3.eth.getAccounts().then(function (accounts) {
-                    if (accounts.length === 0) {
-                        account = null;
-                        document.getElementById('connect').style.display = 'block';
-                        clearAccount();
-                        clearLogs();
-                        return;
-                    }
-                    if (accounts[0] === account) {
-                        return;
-                    }
-                    account = accounts[0];
-                    document.getElementById('connect').style.display = 'none';
-                    clearAccount();
-                    loadAccount();
-                    logNetwork();
-                    logAccount();
-                }).catch(error);
-            }).catch(error);
-        } else {
-            document.getElementById('connect').style.display = 'none';
-            var newAccount = tronWeb.defaultAddress.base58;
-            var newNetwork = tronWeb.solidityNode.host;
-            if (!newAccount) {
-                network = null;
-                contract = null;
-                account = null;
-                document.getElementById('startMessage').innerHTML = 'open tronlink';
-                printContractLink(networkTron);
-                clearContractBalance();
-                clearAccount();
-                clearLogs();
-                return;
-            }
-            if (newNetwork !== networkTron && newNetwork !== networkTronStack &&
-                newNetwork !== networkShasta) {
-                network = null;
-                contract = null;
-                account = null;
-                document.getElementById('startMessage').innerHTML =
-                    'switch to the main or shasta network';
-                printContractLink(networkTron);
-                clearContractBalance();
-                clearAccount();
-                clearLogs();
-                return;
-            }
-            if (network !== newNetwork) {
-                network = newNetwork;
-                contract = null;
-                var address;
-                if (network === networkTron || network === networkTronStack) {
-                    address = tronAddress;
-                } else if (network === networkShasta) {
-                    address = shastaAddress;
-                }
-                tronWeb.contract().at(address).then(function (tronContract) {
-                    contract = tronContract;
-                    loadContractBalance();
-                    loadAccount();
-                    contract.Transfer().watch(function (error, result) {
-                        if (!error && !eth && network && contract) {
-                            loadContractBalance();
-                            loadAccount();
-                        }
-                    });
-                    contract.Withdraw().watch(function (error, result) {
-                        if (!error && !eth && network && contract) {
-                            loadContractBalance();
-                            loadAccount();
-                        }
-                    });
-                }).catch(function (error) {
-                    network = null;
-                    console.error(error);
-                    if (error.message) {
-                        error = error.message;
-                    }
-                    alert(error);
-                });
-                account = newAccount;
-                document.getElementById('startMessage').innerHTML = '';
-                printContractLink(network);
-                clearContractBalance();
-                clearLogs();
-                logNetwork();
-                logAccount();
-            } else {
-                if (account !== newAccount) {
+                } else if (!newAccount) {
+                    throw Error();
+                } else if (newAccount !== account) {
                     account = newAccount;
-                    logAccount();
+                    document.getElementById('connect').style.display = 'none';
+                    printMessage();
+                    initAccount();
                 }
-                if (contract) {
-                    loadContractBalance();
-                    loadAccount();
-                }
-            }
-        }
-    }
-
-    function connect() {
-        if (eth) {
-            if (!window.ethereum) {
-                alert('ethereum is not supported');
-                return;
-            }
-            var f;
-            startLoading();
-            if (!ethereum.request) {
-                f = ethereum.enable();
-            } else {
-                f = ethereum.request({method: 'eth_requestAccounts'});
-            }
-            f.then(function () {
-                return web3.eth.getChainId();
-            }).then(function (newNetwork) {
-                stopLoading();
-                newNetwork = Number(newNetwork);
-                if (pls) {
-                    if (newNetwork !== networkPls && newNetwork !== networkPlsTestnet) {
-                        return ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{chainId: '0x171'}]
-                        }).then(load);
-                    }
-                } else if (newNetwork !== networkEth && newNetwork !== networkRopsten &&
-                    newNetwork !== networkGoerli) {
-                    return ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{chainId: '0x1'}]
-                    }).then(load);
-                }
-            }).catch(function (error) {
-                if (error.code === 4902) {
-                    ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: '0x171',
-                            chainName: 'PulseChain',
-                            nativeCurrency: {symbol: 'PLS', decimals: 18},
-                            rpcUrls: ['https://rpc.pulsechain.com'],
-                            blockExplorerUrls: ['https://otter.pulsechain.com']
-                        }]
-                    }).then(function () {
-                        connect();
-                    }).catch(error);
-                }
+                loadEth();
+            }).catch(function () {
+                account = null;
+                document.getElementById('connect').style.display = 'block';
+                printMessage('no accounts connected');
+                initAccount();
+                loadEth();
             });
         }
     }
 
-    function buy() {
-        document.getElementById('buyValueHint').innerHTML = '';
-        if (!check()) {
+    function setTrx() {
+        if (page.isEth) {
+            return;
+        } else if (!window.tronWeb) {
+            document.getElementById('connect').style.display = 'none';
+            return printMessage('use tron browser');
+        } else if (!trxProvider) {
+            trxProvider = true;
+            addEventListener('message', function (event) {
+                if (event.data.message) {
+                    setTrx();
+                }
+            });
+        }
+
+        document.getElementById('connect').style.display = 'none';
+        var newChainId = tronWeb.solidityNode.host;
+        var newAccount = tronWeb.defaultAddress.base58;
+        if (!newAccount) {
+            chain = null;
+            account = null;
+            initPage();
+            return printMessage('open tronlink');
+        } else if (newChainId !== trx.chainId && newChainId !== trxTest.chainId) {
+            chain = null;
+            account = null;
+            initPage();
+            return printMessage('switch to the main or shasta network');
+        }
+        if (!chain || chain.chainId !== newChainId) {
+            if (newChainId === trx.chainId) {
+                chain = trx;
+            } else if (newChainId === trxTest.chainId) {
+                chain = trxTest;
+            }
+            tronWeb.contract().at(chain.address).then(function (contract) {
+                trxContract = contract;
+                trxContract.Transfer().watch(loadTrx);
+                trxContract.Withdraw().watch(loadTrx);
+            }).catch(error);
+        }
+        account = newAccount;
+        printMessage();
+    }
+
+    function loadEth() {
+        if (!chain || !chain.isEth) {
             return;
         }
-        var value = new BigNumber(document.getElementById('buyValue').value);
-        if (value.isNaN()) {
+        var chainId = chain.chainId;
+        ethProvider.getBalance(chain.address).then(function (balance) {
+            if (!chain || chain.chainId !== chainId) {
+                return;
+            }
+            printValue(balance, 'contractBalance');
+        }).catch(error);
+        if (!account) {
+            return;
+        }
+        ethContract.balanceOf(account).then(function (balance) {
+            if (!chain || chain.chainId !== chainId) {
+                return;
+            }
+            printValue(balance, 'balance');
+            if (balance.gte(ethers.utils.parseUnits(chain.pitRefRequirement.toString()))) {
+                var link = window.location.hostname + window.location.pathname + '?eth=' + account;
+                document.getElementById('ref').style.display = 'block';
+                document.getElementById('reflink').innerHTML = '<a target="_blank" rel="noopener" ' +
+                    'href="https://' + link + '">' + link + '</a>';
+            } else {
+                document.getElementById('ref').style.display = 'none';
+                document.getElementById('reflink').innerHTML = '';
+            }
+        }).catch(error);
+        var refDividends;
+        ethContract.refDividendsOf(account).then(function (dividends) {
+            if (!chain || chain.chainId !== chainId || !account) {
+                return;
+            }
+            refDividends = dividends.mul(1000).div(1000 * chain.pitPrice);
+            printValue(refDividends, 'refDividend');
+            return ethContract.dividendsOf(account);
+        }).then(function (dividends) {
+            if (!chain || chain.chainId !== chainId) {
+                return;
+            }
+            if (dividends.eq(1)) {
+                dividends = ethers.constants.Zero;
+            }
+            dividends = dividends.mul(1000).div(1000 * chain.pitPrice).add(refDividends);
+            printValue(dividends, 'dividend');
+        }).catch(error);
+    }
+
+    function loadTrx() {
+        tronWeb.trx.getUnconfirmedBalance(contract.address).then(function (balance) {
+            balance = new BigNumber(balance).shiftedBy(-6);
+            printValue(balance, document.getElementById('contractBalance'));
+        }).catch(error);
+        trxContract.balanceOf(account).call().then(function (balance) {
+            accountTokens = new BigNumber(balance._hex).shiftedBy(-18);
+            printValue(accountTokens, document.getElementById('balance'));
+            if (accountTokens >= 1000) {
+                var link = 'pitcoin.network?trx=' + account;
+                document.getElementById('ref').style.display = 'block';
+                document.getElementById('reflink').innerHTML = '<a target="_blank" rel="noopener" ' +
+                    'href="http://' + link + '">' + link + '</a>';
+            } else {
+                document.getElementById('ref').style.display = 'none';
+                document.getElementById('reflink').innerHTML = '';
+            }
+        }).catch(error);
+        trxContract.refDividendsOf(account).call().then(function (dividends) {
+            refDividend = new BigNumber(dividends._hex).shiftedBy(-18);
+            printValue(refDividend, document.getElementById('refDividend'));
+            return trxContract.dividendsOf(account).call();
+        }).then(function (dividends) {
+            dividends = dividends._hex;
+            if (dividends == '0x01') {
+                dividends = '0';
+            }
+            dividends = new BigNumber(dividends).shiftedBy(-18).plus(refDividend);
+            printValue(dividends, document.getElementById('dividend'));
+        }).catch(error);
+    }
+
+    function connect() {
+        if (!page.isEth) {
+            return;
+        }
+        startLoading();
+        connectEth().then(function () {
+            stopLoading();
+        }).catch(error);
+    }
+
+    function connectEth() {
+        return ethereum.request({method: 'eth_requestAccounts'}).then(function () {
+            if (page === eth && chain !== eth && chain !== ethTest) {
+                return ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{chainId: '0x1'}]
+                });
+            } else if (page === pls && chain !== pls && chain !== plsTest) {
+                return ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{chainId: '0x171'}]
+                });
+            }
+        }).catch(function (error) {
+            if (page === pls && error.code === 4902) {
+                return ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x171',
+                        chainName: 'PulseChain',
+                        nativeCurrency: {symbol: 'PLS', decimals: 18},
+                        rpcUrls: ['https://rpc.pulsechain.com'],
+                        blockExplorerUrls: ['https://otter.pulsechain.com']
+                    }]
+                }).then(connectEth);
+            } else {
+                throw error;
+            }
+        });
+    }
+
+    function buy() {
+        printMessage();
+        document.getElementById('buyValueHint').innerHTML = '';
+        var value = document.getElementById('buyValue').value;
+        if (!value || isNaN(value)) {
             document.getElementById('buyValueHint').innerHTML = 'enter a number';
             document.getElementById('buyValue').focus();
             return;
-        } else if (value.isNegative() || value.isZero()) {
+        } else if (value <= 0) {
             document.getElementById('buyValueHint').innerHTML = 'enter a positive number';
             document.getElementById('buyValue').focus();
             return;
         }
         startLoading();
-        var f;
-        if (eth) {
-            f = web3.eth.getBalance(account);
+        if (page.isEth) {
+            buyEth(value);
         } else {
-            f = tronWeb.trx.getUnconfirmedBalance(account);
-        }
-        f.then(function (balance) {
-            balance = new BigNumber(balance).shiftedBy(eth ? -18 : -6);
-            if (balance.isZero()) {
-                document.getElementById('buyValueHint').innerHTML = 'you have no ' +
-                    (pls ? 'pls' : (eth ? 'eth' : 'trx'));
-                stopLoading();
-                return;
-            } else if (value.isGreaterThan(balance)) {
-                document.getElementById('buyValueHint').innerHTML =
-                    'enter a number less than ' + balance.toFixed(6, BigNumber.ROUND_FLOOR);
-                document.getElementById('buyValue').focus();
-                stopLoading();
-                return;
-            }
-            checkRef();
-        }).catch(error);
-
-        function checkRef() {
-            var ref = parse(eth ? 'eth' : 'trx');
-            if (ref === account) {
-                console.log('using you address as ref');
-                ref = null;
-            }
-            if (ref) {
-                if ((eth && !web3.utils.isAddress(ref)) || (!eth && !tronWeb.isAddress(ref))) {
-                    console.log('incorrect ref');
-                    ref = null;
-                }
-            }
-            if (eth) {
-                if (ref) {
-                    contract.methods.balanceOf(ref).call().then(function (balance) {
-                        if (new BigNumber(balance).shiftedBy(-18).isLessThan(pls ? 10 : 10)) {
-                            console.log('not a ref');
-                            ref = '0x0000000000000000000000000000000000000000';
-                        }
-                        doEthTx(ref);
-                    }).catch(error);
-                } else {
-                    doEthTx('0x0000000000000000000000000000000000000000');
-                }
-            } else {
-                doTronTx(ref ? ref : 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb');
-            }
-        }
-
-        function doEthTx(ref) {
-            var message;
-            contract.methods.buy(ref).send({
-                from: account,
-                value: value.shiftedBy(18)
-            }).on('transactionHash', function (hash) {
-                document.getElementById('buyValue').value = '';
-                message = logTx('purchase for ' + value + (pls ? ' PLS' : ' ETH'), hash);
-                stopLoading();
-            }).on('confirmation', function (confirmationNumber, receipt) {
-                if (confirmationNumber != 0) {
-                    return;
-                }
-                if (!receipt.status) {
-                    message.innerHTML = ' - rejected';
-                } else {
-                    loadContractBalance();
-                    loadAccount();
-                    message.innerHTML = ' - confirmed';
-                }
-            }).catch(error);
-        }
-
-        function doTronTx(ref) {
-            var message;
-            contract.buy(ref).send({
-                callValue: value.shiftedBy(6)
-            }).then(function (hash) {
-                document.getElementById('buyValue').value = '';
-                message = logTx('purchase for ' + value + ' TRX', hash);
-                stopLoading();
-                checkTronTx(hash, message);
-            }).catch(error);
+            buyTrx(value);
         }
     }
-    
+
+    function buyEth(value) {
+        var eth = ethers.utils.parseUnits(value);
+        var ref = parse('eth');
+        if (!ref || !ethers.utils.isAddress(ref) || ref === account) {
+            ref = ethers.constants.AddressZero;
+        }
+        var message;
+        connectEth().then(function () {
+            return ethProvider.getBalance(account);
+        }).then(function (balance) {
+            if (balance.isZero()) {
+                document.getElementById('buyValueHint').innerHTML = 'you have no ' + chain.coin;
+                throw Error('you have no ' + chain.coin);
+            } else if (eth.gte(balance)) {
+                document.getElementById('buyValueHint').innerHTML = 'insufficient funds';
+                throw Error('insufficient funds');
+            }
+            return ethContract.buy(ref, {value: eth});
+        }).then(function (txResponse) {
+            document.getElementById('buyValue').value = '';
+            message = logTx('purchase for ' + value + ' ' + chain.coin, txResponse.hash);
+            stopLoading();
+            txResponse.wait().then(function (response) {
+                message.innerHTML = ' - confirmed';
+                loadEth();
+            }).catch(function (responseError) {
+                console.error(responseError);
+                message.innerHTML = error.reason ? error.reason : ' - rejected';
+            });
+        }).catch(error);
+    }
+
+    function buyTrx(value) {
+        var ref = parse('trx');
+        if (!ref || !tronWeb.isAddress(ref) || ref === account) {
+            ref = 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb';
+        }
+        var message;
+        tronWeb.trx.getUnconfirmedBalance(account).then(function (balance) {
+            balance = new BigNumber(balance).shiftedBy(-6);
+            if (balance.isZero()) {
+                document.getElementById('buyValueHint').innerHTML = 'you have no ' + chain.coin;
+                throw Error('insufficient funds');
+            } else if (value.isGreaterThan(balance)) {
+                document.getElementById('buyValueHint').innerHTML = 'insufficient funds';
+                throw Error('insufficient funds');
+            }
+            return trxContract.buy(ref).send({callValue: value.shiftedBy(6)})
+        }).then(function (hash) {
+            document.getElementById('buyValue').value = '';
+            message = logTx('purchase for ' + value + chain.coin, hash);
+            stopLoading();
+            checkTronTx(hash, message);
+        }).catch(error);
+    }
+
     function sell() {
+        printMessage();
         document.getElementById('sellValueHint').innerHTML = '';
-        if (!check()) {
-            return;
-        }
-        if (accountTokens && accountTokens.isZero()) {
-            document.getElementById('sellValueHint').innerHTML = 'you have no tokens';
-            document.getElementById('buyValue').focus();
-            return;
-        }
-        var value = new BigNumber(document.getElementById('sellValue').value);
-        if (value.isNaN()) {
+        var value = document.getElementById('sellValue').value;
+        if (!value || isNaN(value)) {
             document.getElementById('sellValueHint').innerHTML = 'enter a number';
             document.getElementById('sellValue').focus();
             return;
-        } else if (value.isNegative() || value.isZero()) {
+        } else if (value <= 0) {
             document.getElementById('sellValueHint').innerHTML = 'enter a positive number';
             document.getElementById('sellValue').focus();
             return;
-        } else if (accountTokens && value.isGreaterThan(accountTokens)) {
-            document.getElementById('sellValueHint').innerHTML = 'insufficient balance';
-            document.getElementById('sellValue').value = accountTokens.toFixed(18);
-            document.getElementById('sellValue').focus();
-            return;
         }
         startLoading();
-        var message;
-        if (eth) {
-            contract.methods.sell(value.shiftedBy(18).toFixed(0)).send({
-                from: account
-            }).on('transactionHash', function (hash) {
-                document.getElementById('sellValue').value = '';
-                message = logTx('sale of ' + value + ' PIT', hash);
-                stopLoading();
-            }).on('confirmation', function (confirmationNumber, receipt) {
-                if (confirmationNumber != 0) {
-                    return;
-                }
-                if (!receipt.status) {
-                    message.innerHTML = ' - rejected';
-                } else {
-                    loadAccount();
-                    message.innerHTML = ' - confirmed';
-                }
-            }).catch(error);
+        if (page.isEth) {
+            sellEth(value);
         } else {
-            contract.sell(value.shiftedBy(18).toFixed(0)).send().then(function (hash) {
-                document.getElementById('sellValue').value = '';
-                message = logTx('sale of ' + value + ' PIT', hash);
-                stopLoading();
-                checkTronTx(hash, message);
-            }).catch(error);
+            sellTrx(value);
         }
     }
 
-    function withdraw() {
-        if (!check()) {
-            return;
-        }
-        startLoading();
+    function sellEth(value) {
+        var pit = ethers.utils.parseUnits(value);
         var message;
-        if (eth) {
-            contract.methods.withdraw().send({
-                from: account
-            }).on('transactionHash', function (hash) {
-                message = logTx('withdrawal', hash);
-                stopLoading();
-            }).on('confirmation', function (confirmationNumber, receipt) {
-                if (confirmationNumber != 0) {
-                    return;
-                }
-                if (!receipt.status) {
-                    message.innerHTML = ' - rejected';
-                } else {
-                    loadContractBalance();
-                    loadAccount();
-                    message.innerHTML = ' - confirmed';
-                }
-            }).catch(error);
-        } else {
-            contract.withdraw().send().then(function (hash) {
-                message = logTx('withdrawal', hash);
-                stopLoading();
-                checkTronTx(hash, message);
-            }).catch(error);
-        }
+        connectEth().then(function () {
+            return ethContract.balanceOf(account);
+        }).then(function (balance) {
+            if (balance.isZero()) {
+                document.getElementById('sellValueHint').innerHTML = 'you have no PIT';
+                throw Error('you have no PIT');
+            } else if (pit.gt(balance)) {
+                document.getElementById('sellValueHint').innerHTML = 'insufficient funds';
+                document.getElementById('sellValue').value = ethers.utils.formatUnits(balance);
+                throw Error('insufficient funds');
+            }
+            return ethContract.sell(pit);
+        }).then(function (txResponse) {
+            document.getElementById('sellValue').value = '';
+            message = logTx('sale of ' + value + ' PIT', txResponse.hash);
+            stopLoading();
+            txResponse.wait().then(function (response) {
+                message.innerHTML = ' - confirmed';
+                loadEth();
+            }).catch(function (responseError) {
+                console.error(responseError);
+                message.innerHTML = error.reason ? error.reason : ' - rejected';
+            });
+        }).catch(error);
+    }
+
+    function sellTrx(value) {
+        var message;
+        trxContract.balanceOf(account).call().then(function (balance) {
+            balance = new BigNumber(balance).shiftedBy(-6);
+            if (balance.isZero()) {
+                document.getElementById('sellValueHint').innerHTML = 'you have no PIT';
+                throw Error('you have no PIT');
+            } else if (value.isGreaterThan(balance)) {
+                document.getElementById('sellValueHint').innerHTML = 'insufficient funds';
+                document.getElementById('sellValue').value = ethers.utils.formatUnits(balance);
+                throw Error('insufficient funds');
+            }
+            return trxContract.sell(value).send();
+        }).then(function (hash) {
+            document.getElementById('sellValue').value = '';
+            message = logTx('sale of ' + value + ' PIT', hash);
+            stopLoading();
+            checkTronTx(hash, message);
+        }).catch(error);
     }
 
     function reinvest() {
-        if (!check()) {
-            return;
-        }
+        printMessage();
         startLoading();
-        var message;
-        if (eth) {
-            contract.methods.reinvest().send({
-                from: account
-            }).on('transactionHash', function (hash) {
-                message = logTx('reinvest', hash);
-                stopLoading();
-            }).on('confirmation', function (confirmationNumber, receipt) {
-                if (confirmationNumber != 0) {
-                    return;
-                }
-                if (!receipt.status) {
-                    message.innerHTML = ' - rejected';
-                } else {
-                    loadAccount();
-                    message.innerHTML = ' - confirmed';
-                }
-            }).catch(error);
+        if (page.isEth) {
+            dividendsEth(true);
         } else {
-            contract.reinvest().send().then(function (hash) {
-                message = logTx('reinvest', hash);
-                stopLoading();
-                checkTronTx(hash, message);
-            }).catch(error);
+            dividendsTrx(true);
+        }
+    }
+    
+    function withdraw() {
+        printMessage();
+        startLoading();
+        if (page.isEth) {
+            dividendsEth(false);
+        } else {
+            dividendsTrx(false);
         }
     }
 
-    function check() {
-        if (eth && !window.ethereum) {
-            alert('ethereum is not supported');
-        } else if (!eth && !window.tronWeb) {
-            alert('tron is not supported');
-        } else if (!eth && !tronWeb.defaultAddress.base58) {
-            alert('open tronlink');
-        } else if (!network) {
-            if (eth) {
-                if (pls) {
-                    alert('switch to the pulsechain network');
-                } else {
-                    alert('switch to the main, ropsten or goerli network');
-                }
-            } else {
-                alert('switch to the main or shasta network');
+    function dividendsEth(reinvest) {
+        var sumDividends, message;
+        connectEth().then(function () {
+            return ethContract.dividendsOf(account);
+        }).then(function (dividends) {
+            sumDividends = dividends;
+            return ethContract.refDividendsOf(account);
+        }).then(function (refDividends) {
+            sumDividends = sumDividends.add(refDividends).mul(1000).div(1000 * chain.pitPrice);
+            if (sumDividends.isZero()) {
+                throw Error('you have no dividends');
             }
-        } else if (!contract) {
-            alert('loading...');
-        } else if (eth && !account) {
-            connect();
-        } else {
-            return true;
-        }
-        return false;
+            if (reinvest) {
+                return ethContract.reinvest();
+            } else {
+                return ethContract.withdraw();
+            }
+        }).then(function (txResponse) {
+            message = reinvest ? 'reinvest of ' : 'withdraw of ';
+            message = message + ethers.utils.formatEther(sumDividends) + ' ' + chain.coin;
+            message = logTx(message, txResponse.hash);
+            stopLoading();
+            txResponse.wait().then(function (response) {
+                message.innerHTML = ' - confirmed';
+                loadEth();
+            }).catch(function (responseError) {
+                console.error(responseError);
+                message.innerHTML = error.reason ? error.reason : ' - rejected';
+            });
+        }).catch(error);
     }
 
-    function printValue(value, element) {
-        if (value.isZero()) {
-            element.title = '';
-            element.innerHTML = '0';
-        } else {
-            element.title = value.toFixed(18);
-            if (value.isGreaterThan(0.001)) {
-                element.innerHTML = value.toFixed(3, BigNumber.ROUND_DOWN);
-            } else if (value.isGreaterThan(0.000001)) {
-                element.innerHTML = value.toFixed(6, BigNumber.ROUND_DOWN);
-            } else {
-                element.innerHTML = value.toExponential(3, BigNumber.ROUND_DOWN);
+    function dividendsTrx(reinvest) {
+        var sumDividends, message;
+        trxContract.dividendsOf(account).call().then(function (dividends) {
+            sumDividends = new BigNumber(dividends).shiftedBy(-6);
+            return trxContract.refDividends(account).call();
+        }).then(function (dividends) {
+            sumDividends = sumDividends.add(new BigNumber(dividends).shiftedBy(-6));
+            if (sumDividends.isZero()) {
+                throw Error('you have no dividends');
             }
-        }
+            if (reinvest) {
+                return trxContract.reinvest().send();
+            } else {
+                return trxContract.withdraw().send();
+            }
+        }).then(function (hash) {
+            message = reinvest ? 'reinvest of ' : 'withdraw of ';
+            message = message + ethers.utils.formatEthers(sumDividends) + ' ' + chain.coin;
+            message = logTx(message, hash);
+            stopLoading();
+            checkTronTx(hash, message);
+        }).catch(error);
     }
 
     function checkTronTx(hash, message) {
         setTimeout(function () {
-            if (eth || !network || !contract) {
+            if (chain.isEth) {
                 return;
             }
-            loadContractBalance();
-            loadAccount();
             tronWeb.trx.getConfirmedTransaction(hash).then(function (tx) {
                 if (tx.ret[0].contractRet === 'SUCCESS') {
                     message.innerHTML = ' - confirmed';
@@ -728,211 +621,88 @@
         }, 3000);
     }
 
+    
     function error(error) {
         stopLoading();
         console.error(error);
         if (error.message) {
             error = error.message;
         }
-        alert('error: ' + error);
+        printMessage('error: ' + error);
     }
 
-    function printContractLink(network) {
-        if (eth) {
-            if (network === networkEth) {
-                document.getElementById('contract').innerHTML = ethAddress;
-                document.getElementById('contract').href =
-                    'https://etherscan.io/address/' + ethAddress;
-            } else if (network === networkRopsten) {
-                document.getElementById('contract').innerHTML = ropstenAddress;
-                document.getElementById('contract').href =
-                    'https://ropsten.etherscan.io/address/' + ropstenAddress;
-            } else if (network === networkGoerli) {
-                document.getElementById('contract').innerHTML = goerliAddress;
-                document.getElementById('contract').href =
-                    'https://goerli.etherscan.io/address/' + goerliAddress;
-            } else if (network === networkPls) {
-                document.getElementById('contract').innerHTML = plsAddress;
-                document.getElementById('contract').href =
-                    'https://otter.pulsechain.com/address/' + plsAddress;
-            } else if (network === networkPlsTestnet) {
-                document.getElementById('contract').innerHTML = plsTestnetAddress;
-                document.getElementById('contract').href =
-                    'https://scan.v4.testnet.pulsechain.com/#/address/' + plsTestnetAddress;
-            }
-        } else {
-            if (network === networkTron || network === networkTronStack) {
-                document.getElementById('contract').innerHTML = tronAddress;
-                document.getElementById('contract').href =
-                    'https://tronscan.org/#/contract/' + tronAddress;
-            } else if (network === networkShasta) {
-                document.getElementById('contract').innerHTML = shastaAddress;
-                document.getElementById('contract').href =
-                    'https://shasta.tronscan.org/#/contract/' + shastaAddress;
-            }
+    function initPage() {
+        var currencies = document.getElementsByClassName('currency');
+        for (var i = currencies.length - 1; i >= 0; i--) {
+            currencies[i].innerHTML = chain ? chain.coin : page.coin;
         }
-    }
-
-    function clearContractBalance() {
-        document.getElementById('contractBalance').title = '';
-        document.getElementById('contractBalance').innerHTML = '...';
-    }
-
-    function loadContractBalance() {
-        if (eth) {
-            web3.eth.getBalance(contract.options.address).then(function (balance) {
-                balance = new BigNumber(balance).shiftedBy(-18);
-                printValue(balance, document.getElementById('contractBalance'));
-            }).catch(error);
-        } else if (!lock0) {
-            lock0 = true;
-            tronWeb.trx.getUnconfirmedBalance(contract.address).then(function (balance) {
-                balance = new BigNumber(balance).shiftedBy(-6);
-                printValue(balance, document.getElementById('contractBalance'));
-                lock0 = false;
-            }).catch(error);
-        }
-    }
-
-    function clearAccount() {
-        accountTokens = null;
-        document.getElementById('balance').title = '';
-        document.getElementById('balance').innerHTML = '...';
+        document.getElementById('contract').innerHTML = chain ? chain.address : page.address;
+        document.getElementById('contract').href =
+            chain ? chain.contractLink + chain.address : page.contractLink + page.address;
+        printValue(null, 'contractBalance');
+        document.getElementById('price').innerHTML = chain ? chain.pitPrice : page.pitPrice;
+        document.getElementById('refAmount').innerHTML =
+            chain ? chain.pitRefRequirement : page.pitRefRequirement;
+        printValue(null, 'balance');
         document.getElementById('buyValueHint').innerHTML = '';
         document.getElementById('buyValue').value = '';
         document.getElementById('sellValueHint').innerHTML = '';
         document.getElementById('sellValue').value = '';
-        document.getElementById('dividend').title = '';
-        document.getElementById('dividend').innerHTML = '...';
-        document.getElementById('refDividend').title = '';
-        document.getElementById('refDividend').innerHTML = '...';
+        printValue(null, 'dividend');
+        printValue(null, 'refDividend');
         document.getElementById('ref').style.display = 'none';
         document.getElementById('reflink').innerHTML = '';
-    }
-
-    function loadAccount() {
-        var refDividend;
-        if (eth) {
-            contract.methods.refDividendsOf(account).call().then(function (dividends) {
-                refDividend = new BigNumber(dividends).shiftedBy(pls ? -18 : -19);
-                printValue(refDividend, document.getElementById('refDividend'));
-                return contract.methods.dividendsOf(account).call();
-            }).then(function (dividends) {
-                if (dividends == '1') {
-                    dividends = '0';
-                }
-                dividends = new BigNumber(dividends).shiftedBy(pls ? -18 : -19).plus(refDividend);
-                printValue(dividends, document.getElementById('dividend'));
-            }).catch(error);
-            contract.methods.balanceOf(account).call().then(function (balance) {
-                accountTokens = new BigNumber(balance).shiftedBy(-18);
-                printValue(accountTokens, document.getElementById('balance'));
-                if (accountTokens >= 10) {
-                    var link = window.location.hostname + window.location.pathname + '?eth=' + account;
-                    document.getElementById('ref').style.display = 'block';
-                    document.getElementById('reflink').innerHTML = '<a target="_blank" rel="noopener" ' +
-                        'href="https://' + link + '">' + link + '</a>';
-                } else {
-                    document.getElementById('ref').style.display = 'none';
-                    document.getElementById('reflink').innerHTML = '';
-                }
-            }).catch(error);
-        } else if (!lock1) {
-            lock1 = true;
-            contract.refDividendsOf(account).call().then(function (dividends) {
-                refDividend = new BigNumber(dividends._hex).shiftedBy(-18);
-                printValue(refDividend, document.getElementById('refDividend'));
-                return contract.dividendsOf(account).call();
-            }).then(function (dividends) {
-                dividends = dividends._hex;
-                if (dividends == '0x01') {
-                    dividends = '0';
-                }
-                dividends = new BigNumber(dividends).shiftedBy(-18).plus(refDividend);
-                printValue(dividends, document.getElementById('dividend'));
-                lock1 = false;
-            }).catch(error);
-            contract.balanceOf(account).call().then(function (balance) {
-                accountTokens = new BigNumber(balance._hex).shiftedBy(-18);
-                printValue(accountTokens, document.getElementById('balance'));
-                if (accountTokens >= 1000) {
-                    var link = 'pitcoin.network?trx=' + account;
-                    document.getElementById('ref').style.display = 'block';
-                    document.getElementById('reflink').innerHTML = '<a target="_blank" rel="noopener" ' +
-                        'href="http://' + link + '">' + link + '</a>';
-                } else {
-                    document.getElementById('ref').style.display = 'none';
-                    document.getElementById('reflink').innerHTML = '';
-                }
-            }).catch(error);
-        }
-    }
-
-    function clearLogs() {
-        document.getElementById('logs').innerHTML = '';
-    }
-
-    function logNetwork() {
         var div = document.getElementById('logs');
-        if (div.innerHTML !== '') {
-            return;
+        div.innerHTML = '';
+        if (chain) {
+            var p = document.createElement('p');
+            p.innerHTML = 'connected to ' + chain.name;
+            div.appendChild(p);
         }
-        var p = document.createElement('p');
-        if (eth) {
-            if (network === networkEth) {
-                p.innerHTML = 'ethereum mainnet';
-            } else if (network === networkRopsten) {
-                p.innerHTML = 'ethereum ropsten test network';
-            } else if (network === networkGoerli) {
-                p.innerHTML = 'ethereum goerli test network';
-            } else if (network === networkPls) {
-                p.innerHTML = 'pulsechain mainnet';
-            } else if (network === networkPlsTestnet) {
-                p.innerHTML = 'pulsechain testnet';
-            }
-        } else {
-            if (network === networkTron || network === networkTronStack) {
-                p.innerHTML = 'tron mainnet';
-            } else if (network === networkShasta) {
-                p.innerHTML = 'tron shasta test network';
-            }
-        }
-        div.insertBefore(p, div.firstChild);
     }
 
-    function logAccount() {
-        var p = document.createElement('p');
-        p.className = 'onestring';
-        var span = document.createElement('span');
-        span.innerHTML = 'account ';
-        p.appendChild(span);
-        var a = document.createElement('a');
-        if (eth) {
-            a.innerHTML = web3.utils.toChecksumAddress(account);
-            if (network === networkEth) {
-                a.href = 'https://etherscan.io/address/' + account;
-            } else if (network === networkRopsten) {
-                a.href = 'https://ropsten.etherscan.io/address/' + account;
-            } else if (network === networkGoerli) {
-                a.href = 'https://goerli.etherscan.io/address/' + account;
-            } else if (network === networkPls) {
-                a.href = 'https://otter.pulsechain.com/address/' + account;
-            } else if (network === networkPlsTestnet) {
-                a.href = 'https://scan.v4.testnet.pulsechain.com/#/address/' + account;
-            }
-        } else {
+    function initAccount() {
+        document.getElementById('buyValueHint').innerHTML = '';
+        document.getElementById('sellValueHint').innerHTML = '';
+        printValue(null, 'balance');
+        printValue(null, 'dividend');
+        printValue(null, 'refDividend');
+        document.getElementById('ref').style.display = 'none';
+        document.getElementById('reflink').innerHTML = '';
+        if (account) {
+            var p = document.createElement('p');
+            p.className = 'onestring';
+            var span = document.createElement('span');
+            span.innerHTML = 'account ';
+            p.appendChild(span);
+            var a = document.createElement('a');
             a.innerHTML = account;
-            if (network === networkTron || network === networkTronStack) {
-                a.href = 'https://tronscan.org/#/address/' + account;
-            } else if (network === networkShasta) {
-                a.href = 'https://shasta.tronscan.org/#/address/' + account;
-            }
+            a.href = chain.addressLink + account;
+            a.setAttribute('target', '_blank');
+            a.setAttribute('rel', 'noopener');
+            p.appendChild(a);
+            var div = document.getElementById('logs');
+            div.insertBefore(p, div.firstChild);
         }
-        a.setAttribute('target', '_blank');
-        a.setAttribute('rel', 'noopener');
-        p.appendChild(a);
-        var div = document.getElementById('logs');
-        div.insertBefore(p, div.firstChild);
+    }
+
+    function printMessage(msg) {
+        document.getElementById('startMessage').innerHTML = msg ? msg : '';
+    }
+
+    function printValue(value, elementId) {
+        var element = document.getElementById(elementId);
+        if (value === null) {
+            element.innerHTML = '...';
+            element.title = '';
+        } else if (value.isZero()) {
+            element.innerHTML = '0';
+            element.title = '';
+        } else {
+            value = ethers.utils.formatEther(value);
+            element.innerHTML = value.substring(0, value.indexOf('.') + 7);
+            element.title = value;
+        }
     }
 
     function logTx(message, hash) {
@@ -943,25 +713,7 @@
         p.appendChild(span);
         var a = document.createElement('a');
         a.innerHTML = hash;
-        if (eth) {
-            if (network === networkEth) {
-                a.href = 'https://etherscan.io/tx/' + hash;
-            } else if (network === networkRopsten) {
-                a.href = 'https://ropsten.etherscan.io/tx/' + hash;
-            } else if (network === networkGoerli) {
-                a.href = 'https://goerli.etherscan.io/tx/' + hash;
-            } else if (network === networkPls) {
-                a.href = 'https://otter.pulsechain.com/tx/' + hash;
-            } else if (network === networkPlsTestnet) {
-                a.href = 'https://scan.v4.testnet.pulsechain.com/#/tx/' + hash;
-            }
-        } else {
-            if (network === networkTron || network === networkTronStack) {
-                a.href = 'https://tronscan.org/#/transaction/' + hash;
-            } else if (network === networkShasta) {
-                a.href = 'https://shasta.tronscan.org/#/transaction/' + hash;
-            }
-        }
+        a.href = chain.txLink + hash;
         a.setAttribute('target', '_blank');
         a.setAttribute('rel', 'noopener');
         p.appendChild(a);
