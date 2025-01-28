@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+    var page, chain, account, ethProvider, ethContract, trxProvider, trxContract;
     var eth = {
         name: 'Ethereum mainnet',
         isEth: true,
@@ -84,8 +85,7 @@
         'event Withdraw(address indexed, uint256)',
         'event Transfer(address indexed, address indexed, uint256)'
     ];
-    var page, chain, account, ethProvider, ethContract, trxProvider, trxContract;
-
+    
     window.onload = function () {
         document.getElementById('pls').onclick = function () {
             openPage(pls);
@@ -121,6 +121,19 @@
         openPage(pls);
     };
 
+    window.onerror = function (message, source, lineno, colno, error) {
+        try {
+            fetch('https://aqoleg.com/log', {
+                method: 'POST',
+                body: JSON.stringify({
+                    file: 'pitcoin',
+                    error: error.stack ? error.stack : error.toString()
+                })
+            });
+        } catch(e) {}
+        return true;
+    };
+
     function openPage(newPage) {
         page = newPage;
         chain = null;
@@ -140,15 +153,25 @@
     function setEth() {
         if (!page.isEth) {
             return;
-        } else if (!window.ethereum) {
+        }
+        if (!ethProvider) {
+            window.providers = [];
+            window.addEventListener('eip6963:announceProvider', function (provider) {
+                providers.push(provider.detail);
+            });
+            window.dispatchEvent(new Event('eip6963:requestProvider'));
+            var provider = providers.length > 0 ? providers[0].provider : window.ethereum;
+            if (provider) {
+                ethProvider = new ethers.providers.Web3Provider(provider, 'any');
+                if (provider.on) {
+                    provider.on('chainChanged', setEth);
+                    provider.on('accountsChanged', setEth);
+                }
+            }
+        }
+        if (!ethProvider) {
             document.getElementById('connect').style.display = 'none';
             return printMessage('use ethereum browser');
-        } else if (!ethProvider) {
-            ethProvider = new ethers.providers.Web3Provider(ethereum, 'any');
-            if (ethereum.on) {
-                ethereum.on('chainChanged', setEth);
-                ethereum.on('accountsChanged', setEth);
-            }
         }
 
         ethProvider.getNetwork().then(function (newChainId) {
