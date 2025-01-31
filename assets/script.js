@@ -51,14 +51,14 @@
         pitRefRequirement: 1000
     };
     var trx = {
-        name: 'Tron',
+        name: 'Tron mainnet',
         isEth: false,
         chainId: 'https://api.trongrid.io',
         address: 'TBxWTtKLUX4JcBbow9C41Q5EomdtQNZp97',
         coin: 'TRX',
-        contractLink: 'https://tronscan.org/#/contract/',
+        contractLink: 'https://tronscan.org/#/token20/',
         addressLink: 'https://tronscan.org/#/address/',
-        txLink: 'https://tronscan.org/#/tx/',
+        txLink: 'https://tronscan.org/#/transaction/',
         pitPrice: 1,
         pitRefRequirement: 1000
     };
@@ -68,9 +68,9 @@
         chainId: 'https://api.shasta.trongrid.io',
         address: 'TKd1M1kRJ2gJV5KwTphxE9a7jPNHztZzc7',
         coin: 'tTRX',
-        contractLink: 'https://shasta.tronscan.org/#/contract/',
+        contractLink: 'https://shasta.tronscan.org/#/token20/',
         addressLink: 'https://shasta.tronscan.org/#/address/',
-        txLink: 'https://shasta.tronscan.org/#/tx/',
+        txLink: 'https://shasta.tronscan.org/#/transaction/',
         pitPrice: 1,
         pitRefRequirement: 1000
     };
@@ -173,6 +173,7 @@
             document.getElementById('connect').style.display = 'none';
             return printMessage('use ethereum browser');
         }
+        document.getElementById('connect').style.display = 'block';
 
         ethProvider.getNetwork().then(function (newChainId) {
             if (!page.isEth) {
@@ -183,13 +184,11 @@
                 chain = null;
                 account = null;
                 initPage();
-                document.getElementById('connect').style.display = 'block';
                 return printMessage('switch to ethereum mainnet or goerli testnet');
             } else if (page === pls && newChainId !== pls.chainId && newChainId !== plsTest.chainId) {
                 chain = null;
                 account = null;
                 initPage();
-                document.getElementById('connect').style.display = 'block';
                 return printMessage('switch to pulsechain mainnet or testnet');
             }
             if (!chain || chain.chainId !== newChainId) {
@@ -219,14 +218,12 @@
                     throw Error();
                 } else if (newAccount !== account) {
                     account = newAccount;
-                    document.getElementById('connect').style.display = 'none';
                     printMessage();
                     initAccount();
                 }
                 loadEth();
             }).catch(function () {
                 account = null;
-                document.getElementById('connect').style.display = 'block';
                 printMessage('no accounts connected');
                 initAccount();
                 loadEth();
@@ -243,20 +240,23 @@
         } else if (!trxProvider) {
             trxProvider = true;
             addEventListener('message', function (event) {
-                if (event.data.message) {
-                    setTrx();
+                if (event.data.isTronLink && event.data.message) {
+                    event = event.data.message.action;
+                    if (event === 'setNode' || event === 'accountsChanged') {
+                        setTrx();
+                    }
                 }
             });
         }
+        document.getElementById('connect').style.display = 'block';
 
-        document.getElementById('connect').style.display = 'none';
         var newChainId = tronWeb.solidityNode.host;
         var newAccount = tronWeb.defaultAddress.base58;
-        if (!newAccount) {
+        if (!tronLink.ready || !newChainId || !newAccount) {
             chain = null;
             account = null;
             initPage();
-            return printMessage('open tronlink');
+            return printMessage('unlock and connect tronlink');
         } else if (newChainId !== trx.chainId && newChainId !== trxTest.chainId) {
             chain = null;
             account = null;
@@ -269,14 +269,27 @@
             } else if (newChainId === trxTest.chainId) {
                 chain = trxTest;
             }
+            account = null;
             tronWeb.contract().at(chain.address).then(function (contract) {
                 trxContract = contract;
                 trxContract.Transfer().watch(loadTrx);
                 trxContract.Withdraw().watch(loadTrx);
+                initPage();
+            }).then(function () {
+                if (!chain || chain.isEth) {
+                    return;
+                }
+                account = newAccount;
+                printMessage();
+                initAccount();
+                loadTrx();
             }).catch(error);
+        } else if (newAccount !== account) {
+            account = newAccount;
+            printMessage();
+            initAccount();
+            loadTrx();
         }
-        account = newAccount;
-        printMessage();
     }
 
     function loadEth() {
@@ -329,15 +342,25 @@
     }
 
     function loadTrx() {
-        tronWeb.trx.getUnconfirmedBalance(contract.address).then(function (balance) {
-            balance = new BigNumber(balance).shiftedBy(-6);
-            printValue(balance, document.getElementById('contractBalance'));
+        if (!chain || chain.isEth || !account) {
+            return;
+        }
+        var chainId = chain.chainId;
+        tronWeb.trx.getUnconfirmedBalance(chain.address).then(function (balance) {
+            if (!chain || chain.chainId !== chainId) {
+                return;
+            }
+            balance = new tronWeb.BigNumber(balance).shiftedBy(-6);
+            printValue(balance, 'contractBalance');
         }).catch(error);
         trxContract.balanceOf(account).call().then(function (balance) {
-            accountTokens = new BigNumber(balance._hex).shiftedBy(-18);
-            printValue(accountTokens, document.getElementById('balance'));
-            if (accountTokens >= 1000) {
-                var link = 'pitcoin.network?trx=' + account;
+            if (!chain || chain.chainId !== chainId) {
+                return;
+            }
+            balance = new tronWeb.BigNumber(balance._hex).shiftedBy(-18);
+            printValue(balance, 'balance');
+            if (balance.isGreaterThan(chain.pitRefRequirement)) {
+                var link = window.location.hostname + window.location.pathname + '?trx=' + account;
                 document.getElementById('ref').style.display = 'block';
                 document.getElementById('reflink').innerHTML = '<a target="_blank" rel="noopener" ' +
                     'href="http://' + link + '">' + link + '</a>';
@@ -346,28 +369,41 @@
                 document.getElementById('reflink').innerHTML = '';
             }
         }).catch(error);
+        var refDividends;
         trxContract.refDividendsOf(account).call().then(function (dividends) {
-            refDividend = new BigNumber(dividends._hex).shiftedBy(-18);
-            printValue(refDividend, document.getElementById('refDividend'));
+            if (!chain || chain.chainId !== chainId) {
+                return;
+            }
+            refDividends = new tronWeb.BigNumber(dividends._hex).shiftedBy(-18).div(chain.pitPrice);
+            printValue(refDividends, 'refDividend');
             return trxContract.dividendsOf(account).call();
         }).then(function (dividends) {
+            if (!chain || chain.chainId !== chainId) {
+                return;
+            }
             dividends = dividends._hex;
             if (dividends == '0x01') {
                 dividends = '0';
             }
-            dividends = new BigNumber(dividends).shiftedBy(-18).plus(refDividend);
-            printValue(dividends, document.getElementById('dividend'));
+            dividends = new tronWeb.BigNumber(dividends).shiftedBy(-18).div(chain.pitPrice);
+            dividends = dividends.plus(refDividends);
+            printValue(dividends, 'dividend');
         }).catch(error);
     }
 
     function connect() {
-        if (!page.isEth) {
-            return;
-        }
         startLoading();
-        connectEth().then(function () {
-            stopLoading();
-        }).catch(error);
+        if (page.isEth) {
+            connectEth().then(function () {
+                stopLoading();
+                loadEth();
+            }).catch(error);
+        } else {
+            connectTrx().then(function () {
+                stopLoading();
+                loadTrx();
+            }).catch(error);
+        }
     }
 
     function connectEth() {
@@ -397,6 +433,16 @@
                 }).then(connectEth);
             } else {
                 throw error;
+            }
+        });
+    }
+
+    function connectTrx() {
+        return tronLink.request({method: 'tron_requestAccounts'}).then(function (result) {
+            if (!result) {
+                throw Error('unlock tronlink');
+            } else if (result.code !== 200) {
+                throw Error(result.message);
             }
         });
     }
@@ -449,30 +495,32 @@
                 loadEth();
             }).catch(function (responseError) {
                 console.error(responseError);
-                message.innerHTML = error.reason ? error.reason : ' - rejected';
+                message.innerHTML = responseError.reason ? responseError.reason : ' - rejected';
             });
         }).catch(error);
     }
 
     function buyTrx(value) {
+        var trx = Math.trunc(value * 1000000);
         var ref = parse('trx');
         if (!ref || !tronWeb.isAddress(ref) || ref === account) {
             ref = 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb';
         }
         var message;
-        tronWeb.trx.getUnconfirmedBalance(account).then(function (balance) {
-            balance = new BigNumber(balance).shiftedBy(-6);
-            if (balance.isZero()) {
+        connectTrx().then(function () {
+            return tronWeb.trx.getUnconfirmedBalance(account);
+        }).then(function (balance) {
+            if (balance == 0) {
                 document.getElementById('buyValueHint').innerHTML = 'you have no ' + chain.coin;
-                throw Error('insufficient funds');
-            } else if (value.isGreaterThan(balance)) {
+                throw Error('you have no ' + chain.coin);
+            } else if (trx > balance) {
                 document.getElementById('buyValueHint').innerHTML = 'insufficient funds';
                 throw Error('insufficient funds');
             }
-            return trxContract.buy(ref).send({callValue: value.shiftedBy(6)})
+            return trxContract.buy(ref).send({callValue: trx});
         }).then(function (hash) {
             document.getElementById('buyValue').value = '';
-            message = logTx('purchase for ' + value + chain.coin, hash);
+            message = logTx('purchase for ' + value + ' ' + chain.coin, hash);
             stopLoading();
             checkTronTx(hash, message);
         }).catch(error);
@@ -523,24 +571,27 @@
                 loadEth();
             }).catch(function (responseError) {
                 console.error(responseError);
-                message.innerHTML = error.reason ? error.reason : ' - rejected';
+                message.innerHTML = responseError.reason ? responseError.reason : ' - rejected';
             });
         }).catch(error);
     }
 
     function sellTrx(value) {
+        var pit = new tronWeb.BigNumber(value);
         var message;
-        trxContract.balanceOf(account).call().then(function (balance) {
-            balance = new BigNumber(balance).shiftedBy(-6);
+        connectTrx().then(function () {
+            return trxContract.balanceOf(account).call();
+        }).then(function (balance) {
+            balance = new tronWeb.BigNumber(balance._hex).shiftedBy(-18);
             if (balance.isZero()) {
                 document.getElementById('sellValueHint').innerHTML = 'you have no PIT';
                 throw Error('you have no PIT');
-            } else if (value.isGreaterThan(balance)) {
+            } else if (pit.isGreaterThan(balance)) {
                 document.getElementById('sellValueHint').innerHTML = 'insufficient funds';
-                document.getElementById('sellValue').value = ethers.utils.formatUnits(balance);
+                document.getElementById('sellValue').value = balance.toFixed(18);
                 throw Error('insufficient funds');
             }
-            return trxContract.sell(value).send();
+            return trxContract.sell(pit.shiftedBy(18).toFixed(0)).send();
         }).then(function (hash) {
             document.getElementById('sellValue').value = '';
             message = logTx('sale of ' + value + ' PIT', hash);
@@ -596,18 +647,20 @@
                 loadEth();
             }).catch(function (responseError) {
                 console.error(responseError);
-                message.innerHTML = error.reason ? error.reason : ' - rejected';
+                message.innerHTML = responseError.reason ? responseError.reason : ' - rejected';
             });
         }).catch(error);
     }
 
     function dividendsTrx(reinvest) {
         var sumDividends, message;
-        trxContract.dividendsOf(account).call().then(function (dividends) {
-            sumDividends = new BigNumber(dividends).shiftedBy(-6);
-            return trxContract.refDividends(account).call();
+        connectTrx().then(function () {
+            return trxContract.dividendsOf(account).call();
         }).then(function (dividends) {
-            sumDividends = sumDividends.add(new BigNumber(dividends).shiftedBy(-6));
+            sumDividends = new tronWeb.BigNumber(dividends._hex);
+            return trxContract.refDividendsOf(account).call();
+        }).then(function (refDividends) {
+            sumDividends = sumDividends.plus(new tronWeb.BigNumber(refDividends._hex));
             if (sumDividends.isZero()) {
                 throw Error('you have no dividends');
             }
@@ -618,7 +671,8 @@
             }
         }).then(function (hash) {
             message = reinvest ? 'reinvest of ' : 'withdraw of ';
-            message = message + ethers.utils.formatEthers(sumDividends) + ' ' + chain.coin;
+            message = message + sumDividends.shiftedBy(-18).div(chain.pitPrice).toFixed(18) + ' ' +
+                chain.coin;
             message = logTx(message, hash);
             stopLoading();
             checkTronTx(hash, message);
@@ -636,6 +690,7 @@
                 } else {
                     message.innerHTML = ' - rejected';
                 }
+                loadTrx();
             }).catch(function (error) {
                 if (error.toString().includes('not found')) {
                     checkTronTx(hash, message);
@@ -721,10 +776,19 @@
         } else if (value.isZero()) {
             element.innerHTML = '0';
             element.title = '';
-        } else {
+        } else if (chain.isEth) {
             value = ethers.utils.formatEther(value);
             element.innerHTML = value.substring(0, value.indexOf('.') + 7);
             element.title = value;
+        } else {
+            if (value.isGreaterThan(0.001)) {
+                element.innerHTML = value.toFixed(3, tronWeb.BigNumber.ROUND_DOWN);
+            } else if (value.isGreaterThan(0.000001)) {
+                element.innerHTML = value.toFixed(6, tronWeb.BigNumber.ROUND_DOWN);
+            } else {
+                element.innerHTML = value.toExponential(3, tronWeb.BigNumber.ROUND_DOWN);
+            }
+            element.title = value.toFixed(18);
         }
     }
 
