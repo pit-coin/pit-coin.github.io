@@ -1,0 +1,29 @@
+block 19262622
+
+0x33B3084d9210881D0406a81AB7d5FDc3F13e5E77 (+ 42%)
+    0.25 eth -> 0.059704 eth + 2.963689 pit
+0xF35F2562b231007828C576227D7F9f2f45f3EF03 (+ 75%)
+    1.5 eth -> 2.624481 eth + 0.000766 pit
+0xfD7533DA3eBc49a608eaac6200A88a34fc479C77 (- 15%)
+    7 eth -> 5.931235 eth
+0x255Ac6F82171e2a5D718Ed419baEcAbFb396810e (- 18%)
+    1.5 eth -> 1.232789 eth
+0xe6331a2CAD2dA67a0a3c21874C9888071AaaE568 (- 8%)
+    0.54 eth -> 0.497055 eth + 0.000183 pit + 0.000004 eth divs
+0xc8286Bf025379d52D62eBf2b76854b450b9f7ABC (+ 36%)
+    0.15 eth -> 1.35 pit + 0.068264 eth divs
+0x6B0B5260bd86e1f9CeB91C428496A2BF352ee087 (+ 35%)
+    0.85 eth -> 7.65 pit + 0.381157 eth divs
+0xB3170F9450d5aE02206C1343671FA304353f2d38 (- 19%)
+    0.01 eth -> 0.000003 eth + 0.0081 eth divs
+0x708260F97e2C9743E6Bae34aC7B7B3b28dae38aF (- 18%)
+    1.11 eth -> 0.910711 eth + 0.000285 pit + 0.000005 eth divs
+
+12.91 eth deposited
+11.255978 eth withdrawed
+= 1.654022 eth balance
+0.45753 eth unwithdrawed dividends
+1.196492 eth (11.964924 pit)
+
+OK
+0 hacks, 0 vulnerabilities
