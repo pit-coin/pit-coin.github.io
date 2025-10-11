@@ -272,8 +272,10 @@
             account = null;
             tronWeb.contract().at(chain.address).then(function (contract) {
                 trxContract = contract;
-                trxContract.Transfer().watch(loadTrx);
-                trxContract.Withdraw().watch(loadTrx);
+                if (trxContract.Transfer().watch) {
+                    trxContract.Transfer().watch(loadTrx);
+                    trxContract.Withdraw().watch(loadTrx);
+                }
                 initPage();
             }).then(function () {
                 if (!chain || chain.isEth) {
@@ -357,7 +359,10 @@
             if (!chain || chain.chainId !== chainId) {
                 return;
             }
-            balance = new tronWeb.BigNumber(balance._hex).shiftedBy(-18);
+            if (balance._hex) {
+                balance = balance._hex;
+            }
+            balance = new tronWeb.BigNumber(balance).shiftedBy(-18);
             printValue(balance, 'balance');
             if (balance.isGreaterThan(chain.pitRefRequirement)) {
                 var link = window.location.hostname + window.location.pathname + '?trx=' + account;
@@ -374,16 +379,18 @@
             if (!chain || chain.chainId !== chainId) {
                 return;
             }
-            refDividends = new tronWeb.BigNumber(dividends._hex).shiftedBy(-18).div(chain.pitPrice);
+            if (dividends._hex) {
+                dividends = dividends._hex;
+            }
+            refDividends = new tronWeb.BigNumber(dividends).shiftedBy(-18).div(chain.pitPrice);
             printValue(refDividends, 'refDividend');
             return trxContract.dividendsOf(account).call();
         }).then(function (dividends) {
             if (!chain || chain.chainId !== chainId) {
                 return;
             }
-            dividends = dividends._hex;
-            if (dividends == '0x01') {
-                dividends = '0';
+            if (dividends._hex) {
+                dividends = dividends._hex;
             }
             dividends = new tronWeb.BigNumber(dividends).shiftedBy(-18).div(chain.pitPrice);
             dividends = dividends.plus(refDividends);
@@ -582,7 +589,10 @@
         connectTrx().then(function () {
             return trxContract.balanceOf(account).call();
         }).then(function (balance) {
-            balance = new tronWeb.BigNumber(balance._hex).shiftedBy(-18);
+            if (balance._hex) {
+                balance = balance._hex;
+            }
+            balance = new tronWeb.BigNumber(balance).shiftedBy(-18);
             if (balance.isZero()) {
                 document.getElementById('sellValueHint').innerHTML = 'you have no PIT';
                 throw Error('you have no PIT');
@@ -657,10 +667,16 @@
         connectTrx().then(function () {
             return trxContract.dividendsOf(account).call();
         }).then(function (dividends) {
-            sumDividends = new tronWeb.BigNumber(dividends._hex);
+            if (dividends._hex) {
+                dividends = dividends._hex;
+            }
+            sumDividends = new tronWeb.BigNumber(dividends);
             return trxContract.refDividendsOf(account).call();
         }).then(function (refDividends) {
-            sumDividends = sumDividends.plus(new tronWeb.BigNumber(refDividends._hex));
+            if (refDividends._hex) {
+                refDividends = refDividends._hex;
+            }
+            sumDividends = sumDividends.plus(new tronWeb.BigNumber(refDividends));
             if (sumDividends.isZero()) {
                 throw Error('you have no dividends');
             }
